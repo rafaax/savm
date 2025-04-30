@@ -7,8 +7,11 @@
 
 O SAVM é uma plataforma baseada em machine learning que utiliza SVM para aprender, de forma contínua, como proteger aplicações web contra ataques de injeção SQL. Ele se apoia em duas principais frentes:
 
-Análise Estática: Exame do código-fonte em busca de padrões inseguros e potenciais vulnerabilidades sem executar a aplicação.
-Análise Dinâmica: Monitoramento do comportamento em tempo real, capturando tentativas suspeitas e ataques durante a execução.
+- **Análise Estática:**  
+  Exame do código-fonte em busca de padrões inseguros e potenciais vulnerabilidades sem executar a aplicação.
+
+- **Análise Dinâmica:**  
+  Monitoramento do comportamento em tempo real, capturando tentativas suspeitas e ataques durante a execução.
 
 ## Como funciona?
 
