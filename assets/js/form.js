@@ -1,7 +1,7 @@
 const form = document.getElementById('form');
 form.addEventListener('submit', handleSubmit);
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
@@ -16,11 +16,35 @@ function handleSubmit(event) {
         });
         return;
     }
+
+    const response = await postData('/submit-form', data);
+
+    if (response.status === 'error') {
+        Swal.fire({
+            title: 'Erro!',
+            text: response.message,
+            icon: 'warning',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
     Swal.fire({
         title: 'Successo!',
         text: 'Formulário enviado com sucesso.',
         icon: 'success',
         confirmButtonText: 'OK'
     });
-    console.log(data);
+}
+
+async function postData(url, data) {
+    const response = await fetch("http://localhost:8000" + url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const responseData = await response.json();
+    return responseData;
 }
