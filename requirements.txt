@@ -1,0 +1,9 @@
+pandas
+fastapi
+sqlalchemy
+scikit-learn
+nltk
+wordcloud
+openpyxl
+seaborn
+matplotlib
