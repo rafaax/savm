@@ -1,0 +1,43 @@
+2025-05-09 23:19:42,810 - __main__ - INFO - 🚀 Iniciando API em http://0.0.0.0:8000
+2025-05-09 23:19:42,865 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:19:42,887 - __main__ - INFO - 💾 Vetorizador fallback salvo em C:\apps\savm\src\models\text_features\vectorizer.joblib
+2025-05-09 23:19:42,909 - __main__ - WARNING - ⚠️ Usando vetorizador fallback
+2025-05-09 23:19:42,913 - __main__ - WARNING - ⚠️ Treinando novo modelo fallback
+2025-05-09 23:19:43,078 - __main__ - INFO - 💾 Modelo fallback salvo em C:\apps\savm\src\models\fallback_model.joblib
+2025-05-09 23:19:43,121 - __main__ - ERROR - Falha na verificação: Teste falhou para: SELECT * FROM users
+2025-05-09 23:19:43,121 - __main__ - CRITICAL - Falha na inicialização: Sistema não passou nos testes de verificação
+Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 288, in _verify_system
+    raise ValueError(f"Teste falhou para: {query}")
+ValueError: Teste falhou para: SELECT * FROM users
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 392, in lifespan
+    detector = SQLiDetector(config)
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\apps\savm\src\models\sqli_detector.py", line 202, in __init__
+    self._verify_system()
+  File "C:\apps\savm\src\models\sqli_detector.py", line 291, in _verify_system
+    raise RuntimeError("Sistema não passou nos testes de verificação") from e
+RuntimeError: Sistema não passou nos testes de verificação
+2025-05-09 23:27:23,293 - __main__ - INFO - 🚀 Iniciando API em http://0.0.0.0:8000
+2025-05-09 23:27:23,342 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:27:23,353 - __main__ - INFO - ✅ Vetorizador carregado de C:\apps\savm\src\models\text_features\vectorizer.joblib
+2025-05-09 23:27:23,395 - __main__ - INFO - ✅ Modelo fallback carregado de C:\apps\savm\src\models\fallback_model.joblib
+2025-05-09 23:27:23,443 - __main__ - WARNING - ⚠️ Teste não esperado para: ' OR 1=1 -- (esperado: True, obtido: False)
+2025-05-09 23:27:23,472 - __main__ - WARNING - ⚠️ Teste não esperado para: SELECT 1 (esperado: False, obtido: True)
+2025-05-09 23:27:23,499 - __main__ - WARNING - ⚠️ Teste não esperado para: UPDATE users SET pass='123' (esperado: False, obtido: True)
+2025-05-09 23:27:23,503 - __main__ - ERROR - ❌ Testes falharam (2/5 passaram)
+2025-05-09 23:27:23,507 - __main__ - CRITICAL - Falha crítica na inicialização: Precisão do teste abaixo do mínimo aceitável (3 testes necessários)
+2025-05-09 23:27:23,507 - __main__ - WARNING - ⚠️ Usando detector mínimo de fallback
+2025-05-09 23:35:20,097 - __main__ - INFO - Iniciando API em http://0.0.0.0:8000
+2025-05-09 23:35:20,181 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:35:20,191 - __main__ - INFO - Vetorizador carregado de C:\apps\savm\src\models\text_features\vectorizer.joblib
+2025-05-09 23:35:20,233 - __main__ - INFO - Modelo fallback carregado de C:\apps\savm\src\models\fallback_model.joblib
+2025-05-09 23:35:20,284 - __main__ - WARNING - Teste nao esperado para: ' OR 1=1 -- (esperado: True, obtido: False)
+2025-05-09 23:35:20,313 - __main__ - WARNING - Teste nao esperado para: SELECT 1 (esperado: False, obtido: True)
+2025-05-09 23:35:20,335 - __main__ - WARNING - Teste nao esperado para: UPDATE users SET pass='123' (esperado: False, obtido: True)
+2025-05-09 23:35:20,336 - __main__ - ERROR - Testes falharam (2/5 passaram)
+2025-05-09 23:35:20,336 - __main__ - INFO - SQLiDetector inicializado com sucesso

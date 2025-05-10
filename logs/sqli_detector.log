@@ -1,49 +1,111 @@
-{"timestamp": "2025-05-10T01:24:14.396763Z", "level": "INFO", "message": "Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 250, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:24:14.424112Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:25:57.410326Z", "level": "INFO", "message": "Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 250, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:25:57.437321Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:25:57.440320Z", "level": "INFO", "message": "Carregando modelo de models/production/best_model.joblib", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 61, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:25:57.441498Z", "level": "ERROR", "message": "Falha ao carregar modelo: [Errno 2] No such file or directory: 'models\\\\production\\\\best_model.joblib\\\\model.joblib'", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 65, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:30:42.333386Z", "level": "INFO", "message": "Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 250, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:30:42.357580Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:30:42.361144Z", "level": "INFO", "message": "Carregando modelo de models/production/best_model.joblib", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 61, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:30:42.362224Z", "level": "ERROR", "message": "Falha ao carregar modelo: [Errno 2] No such file or directory: 'models\\\\production\\\\best_model.joblib\\\\model.joblib'", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 65, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:34:52.061470Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 199, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:34:52.090838Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 39, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:34:52.092844Z", "level": "ERROR", "message": "Erro na inicializa√ß√£o: ModelManager.__init__() missing 1 required positional argument: 'config'", "logger": "sqli_detector", "module": "sqli_detector", "function": "__init__", "line": 25, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:34:52.092844Z", "level": "WARNING", "message": "‚ö†Ô∏è Usando modelo dummy - apenas para desenvolvimento!", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_fallback", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:36:51.274193Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 199, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:36:51.301450Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 39, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:36:51.303447Z", "level": "ERROR", "message": "Erro na inicializa√ß√£o: ModelManager.__init__() missing 1 required positional argument: 'config'", "logger": "sqli_detector", "module": "sqli_detector", "function": "__init__", "line": 25, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:36:51.304486Z", "level": "WARNING", "message": "‚ö†Ô∏è Usando modelo dummy - apenas para desenvolvimento!", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_fallback", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:37:24.997742Z", "level": "ERROR", "message": "Erro na detec√ß√£o: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:37:24.997742Z", "level": "ERROR", "message": "Erro na API: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 194, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:37:31.830438Z", "level": "ERROR", "message": "Erro na detec√ß√£o: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:37:31.830438Z", "level": "ERROR", "message": "Erro na API: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 194, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:39:33.041555Z", "level": "ERROR", "message": "Erro na detec√ß√£o: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:39:33.042554Z", "level": "ERROR", "message": "Erro na API: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 194, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:39:35.117909Z", "level": "ERROR", "message": "Erro na detec√ß√£o: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:39:35.117909Z", "level": "ERROR", "message": "Erro na API: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 194, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:22.892239Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 199, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:22.917563Z", "level": "INFO", "message": "Inicializando componentes do SQLiDetector", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_components", "line": 39, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:22.918563Z", "level": "ERROR", "message": "Erro na inicializa√ß√£o: ModelManager.__init__() missing 1 required positional argument: 'config'", "logger": "sqli_detector", "module": "sqli_detector", "function": "__init__", "line": 25, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:22.918563Z", "level": "WARNING", "message": "‚ö†Ô∏è Usando modelo dummy - apenas para desenvolvimento!", "logger": "sqli_detector", "module": "sqli_detector", "function": "_initialize_fallback", "line": 35, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:39.391117Z", "level": "ERROR", "message": "Erro na detec√ß√£o: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:40:39.391117Z", "level": "ERROR", "message": "Erro na API: This RandomForestClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 194, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:41:31.812604Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 211, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:41:31.838603Z", "level": "ERROR", "message": "Falha cr√≠tica na inicializa√ß√£o: 'SQLiDetector' object has no attribute 'text_extractor'", "logger": "sqli_detector", "module": "sqli_detector", "function": "lifespan", "line": 177, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:43:04.860411Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 222, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:43:04.894942Z", "level": "ERROR", "message": "Falha cr√≠tica na inicializa√ß√£o: ModelManager.__init__() missing 1 required positional argument: 'config'", "logger": "sqli_detector", "module": "sqli_detector", "function": "lifespan", "line": 188, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:44:06.688679Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 236, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:44:06.730393Z", "level": "INFO", "message": "Carregando modelo de models/production/best_model.joblib", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 88, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:44:06.763432Z", "level": "INFO", "message": "‚úÖ Modelo carregado com sucesso", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 90, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:45:47.987044Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 236, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:45:48.020971Z", "level": "INFO", "message": "Carregando modelo de models/production/best_model.joblib", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 88, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:45:48.051048Z", "level": "INFO", "message": "‚úÖ Modelo carregado com sucesso", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 90, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:46:54.224168Z", "level": "INFO", "message": "üöÄ Iniciando API em http://0.0.0.0:8000", "logger": "sqli_detector", "module": "sqli_detector", "function": "run_api", "line": 258, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:46:54.255902Z", "level": "INFO", "message": "Carregando modelo de models/production/best_model.joblib", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 100, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:46:54.292024Z", "level": "INFO", "message": "‚úÖ Modelo carregado com sucesso", "logger": "sqli_detector", "module": "sqli_detector", "function": "load_model", "line": 102, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:47:19.277223Z", "level": "ERROR", "message": "Erro na detec√ß√£o: The feature names should match those that were passed during fit.\nFeature names unseen at fit time:\n- 01\n- 2023\n- admin\n- book\n- customers\n- ...\nFeature names seen at fit time, yet now missing:\n- avg_word_length\n- char_\"_count\n- char_#_count\n- char_'_count\n- char_*/_count\n- ...\n", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 157, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:47:19.278224Z", "level": "ERROR", "message": "Erro na API: The feature names should match those that were passed during fit.\nFeature names unseen at fit time:\n- 01\n- 2023\n- admin\n- book\n- customers\n- ...\nFeature names seen at fit time, yet now missing:\n- avg_word_length\n- char_\"_count\n- char_#_count\n- char_'_count\n- char_*/_count\n- ...\n", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 253, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:47:27.679384Z", "level": "ERROR", "message": "Erro na detec√ß√£o: The feature names should match those that were passed during fit.\nFeature names unseen at fit time:\n- 01\n- 2023\n- admin\n- book\n- customers\n- ...\nFeature names seen at fit time, yet now missing:\n- avg_word_length\n- char_\"_count\n- char_#_count\n- char_'_count\n- char_*/_count\n- ...\n", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect", "line": 157, "thread": "MainThread"}
-{"timestamp": "2025-05-10T01:47:27.679384Z", "level": "ERROR", "message": "Erro na API: The feature names should match those that were passed during fit.\nFeature names unseen at fit time:\n- 01\n- 2023\n- admin\n- book\n- customers\n- ...\nFeature names seen at fit time, yet now missing:\n- avg_word_length\n- char_\"_count\n- char_#_count\n- char_'_count\n- char_*/_count\n- ...\n", "logger": "sqli_detector", "module": "sqli_detector", "function": "detect_sqli", "line": 253, "thread": "MainThread"}
+2025-05-09 23:19:42,864 - uvicorn.error - INFO - Started server process [19716]
+2025-05-09 23:19:42,864 - uvicorn.error - INFO - Waiting for application startup.
+2025-05-09 23:19:42,865 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:19:43,121 - __main__ - ERROR - Falha na verificaÁ„o: Teste falhou para: SELECT * FROM users
+2025-05-09 23:19:43,121 - __main__ - CRITICAL - Falha na inicializaÁ„o: Sistema n„o passou nos testes de verificaÁ„o
+Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 288, in _verify_system
+    raise ValueError(f"Teste falhou para: {query}")
+ValueError: Teste falhou para: SELECT * FROM users
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 392, in lifespan
+    detector = SQLiDetector(config)
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\apps\savm\src\models\sqli_detector.py", line 202, in __init__
+    self._verify_system()
+  File "C:\apps\savm\src\models\sqli_detector.py", line 291, in _verify_system
+    raise RuntimeError("Sistema n„o passou nos testes de verificaÁ„o") from e
+RuntimeError: Sistema n„o passou nos testes de verificaÁ„o
+2025-05-09 23:19:43,123 - uvicorn.error - ERROR - Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 288, in _verify_system
+    raise ValueError(f"Teste falhou para: {query}")
+ValueError: Teste falhou para: SELECT * FROM users
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\apps\savm\venv\Lib\site-packages\starlette\routing.py", line 692, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "C:\Python312\Lib\contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\apps\savm\src\models\sqli_detector.py", line 392, in lifespan
+    detector = SQLiDetector(config)
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\apps\savm\src\models\sqli_detector.py", line 202, in __init__
+    self._verify_system()
+  File "C:\apps\savm\src\models\sqli_detector.py", line 291, in _verify_system
+    raise RuntimeError("Sistema n„o passou nos testes de verificaÁ„o") from e
+RuntimeError: Sistema n„o passou nos testes de verificaÁ„o
+
+2025-05-09 23:19:43,124 - uvicorn.error - ERROR - Application startup failed. Exiting.
+2025-05-09 23:27:23,338 - uvicorn.error - INFO - Started server process [20924]
+2025-05-09 23:27:23,339 - uvicorn.error - INFO - Waiting for application startup.
+2025-05-09 23:27:23,342 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:27:23,507 - __main__ - CRITICAL - Falha crÌtica na inicializaÁ„o: Precis„o do teste abaixo do mÌnimo aceit·vel (3 testes necess·rios)
+2025-05-09 23:27:23,510 - uvicorn.error - INFO - Application startup complete.
+2025-05-09 23:27:23,511 - uvicorn.error - INFO - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-05-09 23:35:11,029 - uvicorn.error - INFO - Shutting down
+2025-05-09 23:35:11,182 - uvicorn.error - INFO - Finished server process [20924]
+2025-05-09 23:35:11,277 - uvicorn.error - ERROR - Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 387, in lifespan
+    if hasattr(self.model, 'predict_proba'):
+       ^^^^^^^^^^^^^^^^^^^^
+  File "C:\apps\savm\src\models\sqli_detector.py", line 205, in __init__
+    }
+  File "C:\apps\savm\src\models\sqli_detector.py", line 296, in _verify_system
+RuntimeError: Precis„o do teste abaixo do mÌnimo aceit·vel (3 testes necess·rios)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\apps\savm\src\models\sqli_detector.py", line 395, in lifespan
+    result.update({
+    ^^^^^
+  File "C:\apps\savm\venv\Lib\site-packages\starlette\routing.py", line 699, in lifespan
+    await receive()
+  File "C:\apps\savm\venv\Lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\asyncio\queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\apps\savm\venv\Lib\site-packages\starlette\routing.py", line 692, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "C:\Python312\Lib\contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+  File "C:\apps\savm\src\models\sqli_detector.py", line 397, in lifespan
+    'probability': proba,
+  File "C:\Python312\Lib\logging\__init__.py", line 1539, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "C:\Python312\Lib\logging\__init__.py", line 1684, in _log
+    self.handle(record)
+  File "C:\Python312\Lib\logging\__init__.py", line 1700, in handle
+    self.callHandlers(record)
+  File "C:\Python312\Lib\logging\__init__.py", line 1762, in callHandlers
+    hdlr.handle(record)
+  File "C:\Python312\Lib\logging\__init__.py", line 1011, in handle
+    def handle(self, record):
+    
+KeyboardInterrupt
+
+2025-05-09 23:35:20,097 - __main__ - INFO - Iniciando API em http://0.0.0.0:8000
+2025-05-09 23:35:20,180 - uvicorn.error - INFO - Started server process [6288]
+2025-05-09 23:35:20,181 - uvicorn.error - INFO - Waiting for application startup.
+2025-05-09 23:35:20,181 - __main__ - INFO - Inicializando SQLiDetector...
+2025-05-09 23:35:20,191 - __main__ - INFO - Vetorizador carregado de C:\apps\savm\src\models\text_features\vectorizer.joblib
+2025-05-09 23:35:20,233 - __main__ - INFO - Modelo fallback carregado de C:\apps\savm\src\models\fallback_model.joblib
+2025-05-09 23:35:20,284 - __main__ - WARNING - Teste nao esperado para: ' OR 1=1 -- (esperado: True, obtido: False)
+2025-05-09 23:35:20,313 - __main__ - WARNING - Teste nao esperado para: SELECT 1 (esperado: False, obtido: True)
+2025-05-09 23:35:20,335 - __main__ - WARNING - Teste nao esperado para: UPDATE users SET pass='123' (esperado: False, obtido: True)
+2025-05-09 23:35:20,336 - __main__ - ERROR - Testes falharam (2/5 passaram)
+2025-05-09 23:35:20,336 - __main__ - INFO - SQLiDetector inicializado com sucesso
+2025-05-09 23:35:20,336 - uvicorn.error - INFO - Application startup complete.
+2025-05-09 23:35:20,337 - uvicorn.error - INFO - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
