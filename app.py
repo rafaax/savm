@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Form, Depends, Query, Request
 from sqlalchemy import text
-from server.database import FormData, SessionLocal
+from database import FormData, SessionLocal
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ou substitua por ["http://localhost:3000"] para segurança
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
