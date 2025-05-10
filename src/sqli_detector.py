@@ -39,6 +39,7 @@ class SQLIDetector:
 
     def train(self, df_input: pd.DataFrame):
         """Treina o modelo completo e armazena informações necessárias para predição e análise."""
+        
         try:
             if 'query' not in df_input.columns or 'label' not in df_input.columns:
                 raise ValueError("DataFrame de entrada deve conter colunas 'query' e 'label'")
@@ -162,6 +163,7 @@ class SQLIDetector:
         prepared_features = self._prepare_single_query_features(query_string)
         prediction = self.model.predict(prepared_features)
         return int(prediction[0])
+    
 
 
     def predict_proba_single(self, query_string: str) -> np.ndarray:
@@ -171,23 +173,30 @@ class SQLIDetector:
         prepared_features = self._prepare_single_query_features(query_string)
         probabilities = self.model.predict_proba(prepared_features)
         return probabilities[0]
+    
+
 
     def is_trained(self) -> bool:
         return self._is_trained
 
+
+
     def get_last_evaluation_data(self):
         """Retorna os dados da última avaliação para análise de falsos negativos."""
+
         if not self._is_trained or self.y_test_cache is None or self.y_pred_cache is None or self.test_indices is None or self.df_cache is None:
             return None
         return self.df_cache, self.y_test_cache, self.y_pred_cache, self.test_indices
     
+
+
     def save_model(self, filepath: str):
         """Salva a instância inteira do detector."""
+
         if not self._is_trained:
             print("Aviso: Tentando salvar um modelo que ainda não foi treinado.")
         
         try:
-            # Garante que o diretório de destino exista
             dir_name = os.path.dirname(filepath)
             if dir_name: # Se filepath incluir um diretório
                 os.makedirs(dir_name, exist_ok=True)
@@ -198,23 +207,28 @@ class SQLIDetector:
             print(f"Erro ao salvar o detector SQLi: {str(e)}")
             raise
 
+
+
     @classmethod
     def load_model(cls, filepath: str):
         """Carrega uma instância salva do detector SQLi."""
+
         try:
             if not os.path.exists(filepath):
                 print(f"Arquivo do modelo não encontrado em: {filepath}. Retornando None.")
                 return None
             
             detector = joblib.load(filepath)
-            # Verificação básica para garantir que é uma instância da classe e está treinado
+
+            # garantir que é uma instância da classe e está treinado
             if isinstance(detector, cls) and detector.is_trained():
                 print(f"Detector SQLi carregado com sucesso de: {filepath}")
                 return detector
+            
             else:
-                print(f"Arquivo carregado de {filepath} não é um detector SQLi treinado válido ou é de um tipo inesperado. Retornando None.")
-                # Se carregou algo mas não é válido, é melhor retornar None para forçar o retreinamento.
+                print(f"Arquivo carregado de {filepath} não é um detector SQLi treinado válido ou é de um tipo inesperado.")
                 return None
+            
         except Exception as e:
             print(f"Erro ao carregar o detector SQLi de {filepath}: {str(e)}. Retornando None.")
             return None
