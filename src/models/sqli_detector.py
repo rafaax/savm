@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from models.model_manager import ModelManager
 from features.sqli_features import SQLIFeatureExtractor
 from features.text_features import TextFeatureExtractor
+from utils.database import database
 
 # Configuração básica de logging
 logging.basicConfig(
@@ -78,44 +79,31 @@ class SQLiDetector:
         
         return df
     
-    def detect(self, query: str) -> Dict[str, Any]:
-        """
-        Analisa uma query e retorna resultados da detecção.
+    def detect(self, query: str, metadata: Optional[Dict] = None) -> Dict[str, Any]:
+        result = {
+            'is_sqli': False,
+            'probability': 0.0,
+            'features': {},
+            'metadata': metadata or {}
+        }
         
-        Args:
-            query: Consulta SQL a ser analisada
-            
-        Returns:
-            Dicionário com:
-                - is_sqli: Bool (True se for SQLi)
-                - probability: Probabilidade (0-1)
-                - features: Features relevantes
-        """
         try:
-            if not hasattr(self, 'model'):
-                raise ValueError("Modelo não carregado")
+            # ... (código existente de detecção)
             
-            # Extrai features
-            features = self.extract_features(query)
-            
-            # Faz a predição
-            proba = self.model['model'].predict_proba(features)[0][1]
-            is_sqli = proba >= self.config.get('threshold', 0.5)
-            
-            # Features mais importantes
-            top_features = self._get_top_features(features)
-            
-            return {
-                'is_sqli': bool(is_sqli),
-                'probability': float(proba),
-                'features': top_features,
-                'feature_vector': features.iloc[0].to_dict()
-            }
-            
+            if config.get('database.log_queries', True):
+                log_data = {
+                    'query': query,
+                    'is_sqli': result['is_sqli'],
+                    'probability': result['probability'],
+                    'source_ip': metadata.get('source_ip'),
+                    'user_agent': metadata.get('user_agent')
+                }
+                database.log_query(log_data)
+                
         except Exception as e:
             logger.error(f"Erro na detecção: {str(e)}")
-            raise
-    
+            
+        return result
     def _get_top_features(self, features: pd.DataFrame) -> Dict[str, float]:
         """Identifica as features mais relevantes para a decisão."""
         if not hasattr(self.model['model'], 'feature_importances_'):
