@@ -49,25 +49,12 @@ class SQLIDetector:
             # Faz uma cópia para não modificar o DataFrame original passado para a função
             df_processed = df_input.copy()
 
-            print("ANTES de SQLIFeatureExtractor:")
-            print("Tipo da coluna 'query':", df_processed['query'].dtype)
-            print("Amostra da coluna 'query':")
-            print(df_processed['query'].head())
-
             self.df_cache = df_input.copy() # Armazena uma cópia do DF original não processado
 
             # Extrai features
             df_features_extracted = self.feature_extractor.extract_features(df_processed)
-            print("\nDEPOIS de SQLIFeatureExtractor:")
-            print("Tipo da coluna 'query' em df_features_extracted:", df_features_extracted['query'].dtype)
-            print("Amostra da coluna 'query' em df_features_extracted:")
-            print(df_features_extracted['query'].head())
-
 
             queries_for_tfidf = df_features_extracted['query'].astype(str) # Mantenha esta linha explícita
-            print("\nAmostra de queries APÓS .astype(str) para TF-IDF:")
-            print(queries_for_tfidf.head(10))
-
 
             # Verifica se todas as features customizadas esperadas foram geradas
             missing_custom_features = [f for f in self.custom_feature_names if f not in df_features_extracted.columns]
@@ -76,12 +63,6 @@ class SQLIDetector:
                 raise ValueError(f"SQLIFeatureExtractor não gerou as seguintes features esperadas: {missing_custom_features}. Features geradas: {df_features_extracted.columns.tolist()}")
 
             custom_features_data = df_features_extracted[self.custom_feature_names]
-
-            # print("Amostra de queries para TF-IDF:")
-            # print(df_features_extracted['query'].astype(str).head(10))
-            # print("Alguma query é string vazia?", (df_features_extracted['query'].astype(str) == '').any())
-            # print("Alguma query é None/NaN?", df_features_extracted['query'].astype(str).isnull().any())
-
             
             # Fit e transform TF-IDF na 'query' original
             X_tfidf_matrix = self.vectorizer.fit_transform(df_features_extracted['query'].astype(str))
@@ -177,60 +158,39 @@ class SQLIDetector:
             raise RuntimeError("O modelo deve ser treinado antes de fazer predições.")
 
         # 1. Criar um DataFrame para a query única (necessário para SQLIFeatureExtractor)
-        #    O nome da coluna deve ser o mesmo que o esperado pelo seu extrator (ex: 'query')
+    
         single_query_df_input = pd.DataFrame({'query': [query_string]})
 
         # 2. Extrair features customizadas
-        #    SQLIFeatureExtractor espera um DataFrame e adiciona colunas a ele.
-        #    Precisamos garantir que ele não modifique a query original de uma forma que o TF-IDF não espera.
-        #    Se SQLIFeatureExtractor modifica a coluna 'query' (ex: para lowercase),
-        #    use a query original para TF-IDF e a modificada (se houver) para as custom features,
-        #    ou certifique-se que a modificação é consistente.
-        #    Vamos assumir que SQLIFeatureExtractor retorna um DF com a coluna 'query' (possivelmente modificada)
-        #    e as features customizadas.
         
         df_features_extracted_single = self.feature_extractor.extract_features(single_query_df_input.copy()) # Passar cópia
 
-        # Pegar apenas as features customizadas na ordem correta
-        # self.custom_feature_names foi definido durante o __init__
         custom_features_single_data_unscaled = df_features_extracted_single[self.custom_feature_names]
 
         # 3. Transformar a query original com o TF-IDF Vectorizer treinado
-        #    O vectorizer espera uma lista de strings ou um iterável.
-        #    Use a query_string original, pois o TF-IDF foi treinado com ela (ou com sua versão lowercase).
-        #    Se o SQLIFeatureExtractor faz lowercase, e seu TF-IDF também (lowercase=True),
-        #    então passar a query_string original para TF-IDF está ok.
         
         X_tfidf_matrix_single = self.vectorizer.transform([query_string]) # Passar como lista
         
-        # Converter para DataFrame com os nomes das features TF-IDF aprendidos no treino
-        # self.tfidf_feature_names foi salvo durante o treino
         X_tfidf_df_single = pd.DataFrame(X_tfidf_matrix_single.toarray(), columns=self.tfidf_feature_names, index=custom_features_single_data_unscaled.index) # Manter o mesmo índice
 
         # 4. Concatenar features TF-IDF e features customizadas (NÃO ESCALADAS)
-        #    A ORDEM DEVE SER A MESMA DO TREINAMENTO!
+        
         X_combined_unscaled_single = pd.concat([X_tfidf_df_single, custom_features_single_data_unscaled], axis=1)
         
-        # Garantir que as colunas estão na mesma ordem que durante o fit do scaler
-        # self.all_feature_names_ordered foi salvo durante o treino
         X_combined_unscaled_single = X_combined_unscaled_single[self.all_feature_names_ordered]
 
         # 5. Escalar o conjunto combinado usando o scaler TREINADO
-        #    O scaler espera um DataFrame com as mesmas colunas e ordem do treino.
+
         scaled_X_combined_single_array = self.scaler.transform(X_combined_unscaled_single)
-        
-        # Converter de volta para DataFrame (opcional, mas bom para consistência se o modelo espera)
-        # Ou apenas use o array numpy se o modelo SVC.predict() aceitar diretamente
+
         scaled_X_combined_single_df = pd.DataFrame(scaled_X_combined_single_array, columns=self.all_feature_names_ordered, index=X_combined_unscaled_single.index)
         
-        return scaled_X_combined_single_df # Ou scaled_X_combined_single_array
+        return scaled_X_combined_single_df
 
 
 
     def predict_single(self, query_string: str):
         if not self._is_trained:
-            # Lidar com o caso de modelo não treinado (ex: levantar erro ou retornar default)
-            # print("Modelo não treinado!")
             raise RuntimeError("Modelo não treinado. Por favor, treine o modelo primeiro.")
 
         # Preparar features
@@ -244,7 +204,7 @@ class SQLIDetector:
         
         return {
             "query": query_string,
-            "is_malicious": bool(prediction[0]), # Pega o primeiro (e único) resultado
+            "is_malicious": bool(prediction[0]),
             "probability_benign": probability[0][0],
             "probability_malicious": probability[0][1],
             "label": int(prediction[0])
