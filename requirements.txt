@@ -7,3 +7,4 @@ wordcloud
 openpyxl
 seaborn
 matplotlib
+setuptools
