@@ -12,46 +12,24 @@ from datetime import datetime
 from src.sqli_detector import SQLIDetector
 from dto.QueryInput import QueryInputDTO
 from dto.DetectionResponse import DetectionResponseDTO
+from src.utils.loaders import loadLastModel, loadModelSqli
 
 MODELS_DIR = 'models'
 LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
 MODEL_FILEPATH_TO_LOAD = None
 sqli_detector_instance = None 
 
-if os.path.exists(LATEST_MODEL_INFO_FILE):
-    try:
-        with open(LATEST_MODEL_INFO_FILE, "r") as f:
-            latest_model_filename = f.read().strip()
-        if latest_model_filename:
-            MODEL_FILEPATH_TO_LOAD = os.path.join(MODELS_DIR, latest_model_filename)
-            print(f"API: Informação do último modelo encontrada: '{latest_model_filename}'")
-            print(f"API: Tentando carregar o modelo SQLi de: {MODEL_FILEPATH_TO_LOAD}")
-            if os.path.exists(MODEL_FILEPATH_TO_LOAD):
-                sqli_detector_instance = SQLIDetector.load_model(MODEL_FILEPATH_TO_LOAD)
-            else:
-                print(f"API ERRO: Arquivo do modelo '{MODEL_FILEPATH_TO_LOAD}' (indicado como o mais recente) não encontrado.")
-        else:
-            print(f"API AVISO: Arquivo '{LATEST_MODEL_INFO_FILE}' está vazio.")
-    except Exception as e:
-        print(f"API AVISO: Erro ao ler '{LATEST_MODEL_INFO_FILE}': {e}")
-else:
-    print(f"API AVISO: Arquivo de informação do último modelo ('{LATEST_MODEL_INFO_FILE}') não encontrado. Não é possível carregar um modelo específico.")
 
-# Verifica se o modelo foi carregado e está treinado
-if sqli_detector_instance:
-    if sqli_detector_instance.is_trained():
-        print("API: Modelo SQLi pré-treinado carregado com sucesso.")
-    else:
-        print(f"API ERRO: Modelo carregado de '{MODEL_FILEPATH_TO_LOAD}', mas não está marcado como treinado! Por favor, retreine usando model_train.py.")
-        sqli_detector_instance = None # Considera como não carregado
+# busca o ultimo modelo treinado e pega o caminho dele e o nome dele
+last_model, last_model_path = loadLastModel(LATEST_MODEL_INFO_FILE, MODELS_DIR) 
 
-elif MODEL_FILEPATH_TO_LOAD and not os.path.exists(MODEL_FILEPATH_TO_LOAD):
-    pass
-else:
-    print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado. Execute model_train.py para criar um modelo e o arquivo '{LATEST_MODEL_INFO_FILE}'.")
+if last_model_path: # caso encontrou algum modelo ele instancia o sqli detector com ele
+    sqli_detector_instance = loadModelSqli(last_model_path)
 
-
-
+if not sqli_detector_instance:
+    print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado ou validado. "
+          f"Verifique os avisos/erros anteriores. "
+          f"Execute model_train.py para criar/atualizar o modelo e o arquivo '{LATEST_MODEL_INFO_FILE}'.")
 
 app = FastAPI(
     title="API de Detecção de SQL Injection e Formulários",
