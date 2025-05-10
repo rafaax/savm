@@ -91,7 +91,6 @@ async def root():
 async def submit_form_endpoint(request_data: Request, db=Depends(get_db)):
     data = await request_data.json()
 
-    # A query SQL já espera 'nome', 'email', 'cpf', 'endereco', 'date']
     query_sql = text("""
     INSERT INTO form (nome, email, cpf, endereco, date)
     VALUES (:name, :email, :cpf, :address, :date)
