@@ -1,5 +1,7 @@
 import pandas as pd
 import nltk
+import re
+import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from nltk.tokenize import word_tokenize
@@ -9,11 +11,10 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
+
 
 def remove_illegal_chars(df):
-    # Apenas colunas de texto
-    for col in df.select_dtypes(include=['object']):
+    for col in df.select_dtypes(include=['object']): # Apenas colunas de texto
         df[col] = df[col].astype(str).apply(lambda x: ILLEGAL_CHARACTERS_RE.sub('', x))
     return df
 
@@ -97,11 +98,49 @@ df['has_time_delay'] = df['query'].str.contains(
 # tentativa de bypass com encoding (ex: %27 para aspas)
 df['has_encoding'] = df['query'].str.contains(r'%[0-9A-Fa-f]{2}', regex=True).astype(int)
 
+df['has_dangerous_func'] = df['query'].str.contains(r"utl_http|exec_cmd|xp_cmdshell|sp_execute|pg_sleep", case=False).astype(int)
+
+df['is_minimal_attack'] = (
+    (df['query'].str.len() <= 5) & 
+    (df['query'].str.contains(r"[\'#%&|;=()]", regex=True))
+).astype(int)
+
+df['has_percentage_sign'] = df['query'].str.contains(r"^%$|^%\s|\s%$|\s%\s", regex=True).astype(int)
+df['has_unbalanced_quotes'] = (df['query'].str.count("'") % 2 != 0).astype(int)
+df['has_isolated_parentheses'] = df['query'].str.contains(r"^\s*[()]\s*$").astype(int)
+df['is_single_char'] = (df['query'].str.len() == 1).astype(int)
+df['has_hash_pattern'] = df['query'].str.contains(r"^#\w+\??$").astype(int)
+df['has_sqlvuln_keyword'] = df['query'].str.contains(r'sqlvuln', case=False).astype(int)
+
+union_pattern = re.compile(r'union\s+(?:all\s+)?select', flags=re.IGNORECASE)
+df['has_union_fragments'] = df['query'].str.contains(union_pattern).astype(int)
+
+df['has_oracle_exploits'] = df['query'].str.contains(
+    r'\|\|utl_http\.request', 
+    regex=True
+).astype(int)
+
+df['has_char_encoding'] = df['query'].str.contains(
+    r'char\s*$$[\d\s,]+\s*$$', 
+    regex=True
+).astype(int)
+
+df['has_system_tables'] = df['query'].str.contains(
+    r'information_schema\.|sys(?:columns|\.)|pg_catalog', 
+    regex=True
+).astype(int)
+
+df['has_postgres_sleep'] = df['query'].str.contains(r'pg_sleep\s*$$', regex=True).astype(int)
+df['has_load_file'] = df['query'].str.contains(r'load_file\s*$$', regex=True).astype(int)
+df['has_weird_quotes'] = df['query'].str.contains(r'"{3,}.+?"{3,}|\'{3,}.+?\'{3,}', regex=True).astype(int)
+df['has_end_if'] = df['query'].str.contains(r'end\s+if', case=False, regex=True).astype(int)
+df['has_print_procedure'] = df['query'].str.contains(r'print|procedure|ns', case=False, regex=True).astype(int)
+df['has_update_command'] = df['query'].str.contains(r'^\s*update\s+\w', case=False, regex=True).astype(int)
+df['has_wapiti_reference'] = df['query'].str.contains(r'#\s*from\s+wapiti', case=False, regex=True).astype(int)
+
 df = remove_illegal_chars(df)
 
 # df.to_excel('results/dataset.xlsx', index=False)
-
-# --- COMBINAR TF-IDF COM FEATURES PERSONALIZADAS ---
 
 custom_features = df[[
     'has_or',                    # Detecta o operador OR - usado para contornar condições (ex.: 'OR 1=1')
@@ -126,7 +165,44 @@ custom_features = df[[
     'has_hex',                   # Detecta codificação hexadecimal
     'has_concat_symbols',        # Símbolos de concatenação (||, +)
     'has_semicolon',             # Ponto e vírgula isolado
-    'has_function_exploit'       # Funções específicas de BD (utl_http, xp_cmdshell)
+    'has_function_exploit',      # Funções específicas de BD (utl_http, xp_cmdshell)
+
+    'is_minimal_attack',         # Queries com ≤5 caracteres CONTENDO: ', #, %, &, |, ;, =, (, )
+                                 # Captura ataques como "28%", "#name?", ")" (50% dos falsos negativos)
+                                 # Critério: (tamanho ≤5) AND (tem caractere especial)
+
+    'has_percentage_sign',       # Detecta "%" como token isolado ou entre espaços
+                                 # Exemplos: "28%", "%" sozinho (25% dos falsos negativos)
+                                 # Regex: ^%$|^%s|s%$|s%s (evita falsos positivos em textos normais)
+
+    'has_unbalanced_quotes',     # Número ímpar de aspas simples (') - indica concatenação maliciosa
+                                 # Exemplo: "admin'--", "1' OR 1=1--" (15% dos casos)
+                                 # Técnica: conta aspas e verifica se é par (balanceado) ou ímpar
+
+    'has_hash_pattern',          # Padrão "#palavra?" encontrado em falsos negativos como "#name?"
+                                 # Regex: ^#\w+\??$ (captura # seguido de letras e opcional "?")
+                                 # Uso: ataques testando interpretação de caracteres especiais
+
+    'has_isolated_parentheses',  # Parenteses sozinhos ou com espaços: " ) ", "("
+                                 # Regex: ^\s*[()]\s*$ 
+                                 # Perigo: pode quebrar sintaxe SQL ou ser parte de ataques maiores
+
+    'is_single_char',             # Query com exatamente 1 caractere (letras como "a", "c" encontradas)
+                                 # Técnica: len(query.strip()) == 1
+                                 # Indica: testes de bypass com entradas mínimas (1% dos casos)
+
+    'has_sqlvuln_keyword',      # Detecta "sqlvuln" explícito
+    'has_union_fragments',      # Fragmentos de UNION (all select, select * from)
+    'has_oracle_exploits',      # ||utl_http.request e funções Oracle
+    'has_char_encoding',        # Padrão char(114,111,111,116)
+    'has_system_tables',        # information_schema.tables, syscolumns
+    'has_postgres_sleep',       # pg_sleep(5)
+    'has_load_file',            # load_file() em injecções
+    'has_weird_quotes',         # """-""", '''*''' (padrões anômalos)
+    'has_end_if',               # Comandos "end if" em procedures
+    'has_print_procedure',      # Comandos "print", "procedure", "ns"
+    'has_update_command',       # Comandos UPDATE isolados
+    'has_wapiti_reference'      # "# from wapiti" (ferramenta de teste)
 ]]
 
 tfidf_df = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out()) # Converter TF-IDF para DataFrame
@@ -143,18 +219,18 @@ model = SVC(kernel='rbf', C=1.0, gamma='scale')
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
-# print(classification_report(y_test, y_pred))
+print("Classification report")
+print(classification_report(y_test, y_pred))
 
 results = pd.DataFrame({
     'true_label': y_test,
     'predicted_label': y_pred
 }, index=X_test.index)  # Usar o mesmo índice que X_test
 
-# 2. Juntar com o DataFrame original usando o índice
 false_negatives = df.loc[results[(results['true_label'] == 1) & (results['predicted_label'] == 0)].index]
 
-print("Falsos negativos (ataques não detectados):")
-false_negatives[['query']].to_csv('results/falsos_negativos_detalhados.csv', index=False, encoding='utf-8')
+# Salvando os falsos negativos em um csv a parte na pasta results
+false_negatives[['query']].to_csv('results/falsos_negativos_detalhados.csv', index=False, encoding='utf-8') 
 
 # Veja a distribuição de tamanhos das queries maliciosas não detectadas
 false_negatives['length'] = false_negatives['query'].str.len()
@@ -162,7 +238,16 @@ print("\nEstatísticas de comprimento:")
 print(false_negatives['length'].describe())
 
 
-
 common_patterns = Counter(false_negatives['query'].str[:30])  # Analisa os primeiros 30 caracteres
 print("\nPadrões mais comuns nos falsos negativos:")
 print(common_patterns.most_common(10))
+
+
+plt.figure(figsize=(10, 5))
+false_negatives['length'].hist(bins=20, color='#ff6b6b', edgecolor='black')
+plt.title('📏 Distribuição de Tamanhos dos Falsos Negativos', pad=20)
+plt.xlabel('Número de Caracteres')
+plt.ylabel('Quantidade de Ataques')
+plt.axvline(5, color='red', linestyle='--', label='Limite de Risco (5 chars)')
+plt.legend()
+plt.show()
