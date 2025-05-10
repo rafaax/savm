@@ -18,22 +18,9 @@ class TextFeatureExtractor:
     - Features semânticas (via redução dimensional)
     """
     
-    def __init__(self, config: Dict = None):
-        """
-        Inicializa o extrator com configuração personalizável.
-        
-        Args:
-            config: Dicionário com parâmetros:
-                - ngram_range: Tupla para range de n-grams (padrão: (1, 2))
-                - max_features: Máximo de features TF-IDF (padrão: 100)
-                - svd_components: Componentes para redução dimensional (padrão: 10)
-        """
-        self._setup_default_config()
-        if config:
-            self.config.update(config)
-            
-        self._initialize_models()
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, max_features=100):
+        self.vectorizer = TfidfVectorizer(max_features=max_features)
+        self.feature_names = []
         
     def _setup_default_config(self):
         """Define configurações padrão."""
@@ -65,31 +52,19 @@ class TextFeatureExtractor:
             random_state=42
         )
         
-    def extract(self, df: pd.DataFrame, fit_models: bool = True) -> pd.DataFrame:
-        """
-        Extrai features de texto de um DataFrame.
+    def extract(self, df: pd.DataFrame, fit_models: bool = False) -> pd.DataFrame:
+        if fit_models:
+            tfidf_matrix = self.vectorizer.fit_transform(df['query'])
+            self.feature_names = self.vectorizer.get_feature_names_out()
+        else:
+            tfidf_matrix = self.vectorizer.transform(df['query'])
         
-        Args:
-            df: DataFrame contendo coluna 'query'
-            fit_models: Se True, (re)ajusta os modelos TF-IDF/SVD
-            
-        Returns:
-            DataFrame com features adicionais
-        """
-        if 'query' not in df.columns:
-            raise ValueError("DataFrame deve conter coluna 'query'")
-            
-        df = df.copy()
-        queries = df['query'].astype(str)
-        
-        # Features básicas
-        df = self._extract_basic_features(df, queries)
-        
-        # Features avançadas
-        df = self._extract_advanced_features(df, queries, fit_models)
-        
-        self.logger.info(f"Extraídas {len(df.columns) - 1} features de texto")
-        return df
+        # Garante que temos o mesmo número de features
+        features = pd.DataFrame(
+            tfidf_matrix.toarray(),
+            columns=self.feature_names
+        )
+        return pd.concat([df, features], axis=1)
     
     def _extract_basic_features(self, df: pd.DataFrame, queries: pd.Series) -> pd.DataFrame:
         """Extrai features básicas de texto."""

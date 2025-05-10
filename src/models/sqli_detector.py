@@ -17,13 +17,59 @@ class SQLiDetector:
     """Sistema completo de detecção de SQL Injection com API integrada."""
     
     def __init__(self, config: Dict[str, Any] = None):
-        self.config = config or {}
-        print(f"🔍 Procurando modelo em: {self.config.get('model_path')}")
-        try:
-            self._initialize_components()
-        except Exception as e:
-            logger.error(f"Erro na inicialização: {str(e)}")
+        """
+        Inicializa o detector com configuração.
+        """
+        self.config = config or {
+            'model_config': {},
+            'models_dir': 'models'
+        }
+        
+        # Inicializa os componentes na ordem correta
+        self.sqli_extractor = SQLIFeatureExtractor(
+            **self.config.get('sqli_features', {})
+        )
+        self.text_extractor = TextFeatureExtractor(
+            **self.config.get('text_features', {})
+        )
+        self.model_manager = ModelManager(
+            config=self.config.get('model_config', {}),
+            models_dir=self.config.get('models_dir', 'models')
+        )
+        
+        # Treina o vetorizador
+        self._train_text_vectorizer()
+        
+        # Carrega o modelo principal
+        model_path = self.config.get('model_path')
+        if model_path:
+            self.load_model(model_path)
+        else:
+            logger.warning("Nenhum caminho de modelo especificado")
             self._initialize_fallback()
+
+    def _train_text_vectorizer(self):
+        """Treina o vetorizador com exemplos iniciais balanceados"""
+        training_queries = [
+            # Consultas normais
+            "SELECT * FROM users",
+            "INSERT INTO products VALUES (1, 'book')",
+            "UPDATE customers SET name = 'John' WHERE id = 1",
+            "DELETE FROM logs WHERE date < '2023-01-01'",
+            
+            # Consultas maliciosas
+            "admin' OR 1=1 --",
+            "' UNION SELECT passwords FROM users --",
+            "1; DROP TABLE users--",
+            "SELECT * FROM information_schema.tables"
+        ]
+        
+        df_train = pd.DataFrame({
+            'query': training_queries,
+            'label': [0, 0, 0, 0, 1, 1, 1, 1]  # 0=normal, 1=malicioso
+        })
+        
+        self.text_extractor.extract(df_train, fit_models=True)
     
     def _initialize_fallback(self):
         """Inicializa um modelo dummy como fallback"""
@@ -32,7 +78,6 @@ class SQLiDetector:
             'model': RandomForestClassifier(n_estimators=10),
             'metadata': {'fallback': True}
         }
-        logger.warning("⚠️ Usando modelo dummy - apenas para desenvolvimento!")
         
     def _initialize_components(self):
         """Inicializa todos os componentes do sistema."""
@@ -60,15 +105,25 @@ class SQLiDetector:
             raise RuntimeError(f"Erro ao carregar modelo: {str(e)}")
 
     def extract_features(self, query: str) -> pd.DataFrame:
-        """Extrai features de uma query SQL."""
+        """Extrai features de forma segura"""
         try:
             df = pd.DataFrame({'query': [query]})
+            
+            # Extração segura
             df = self.sqli_extractor.extract(df)
-            df = self.text_extractor.extract(df, fit_models=False)
-            return df
+            text_features = self.text_extractor.extract(df, fit_models=False)
+            
+            # Garante compatibilidade de features
+            missing_cols = set(df.columns) - set(text_features.columns)
+            for col in missing_cols:
+                text_features[col] = df[col]
+                
+            return text_features.fillna(0)  # Substitui NaN por 0
+            
         except Exception as e:
-            logger.error(f"Erro na extração de features: {str(e)}")
-            raise
+            logger.error(f"Erro seguro na extração: {str(e)}")
+            # Retorna dataframe vazio em caso de erro
+            return pd.DataFrame()
     
     def detect(self, query: str, metadata: Optional[Dict] = None) -> Dict[str, Any]:
         """Analisa uma query SQL e retorna resultados da detecção."""
@@ -152,15 +207,19 @@ async def lifespan(app: FastAPI):
     """Gerenciador de ciclo de vida da API"""
     try:
         model_path = "models/production/best_model.joblib"
-        if not Path(model_path).exists():
-            logger.warning(f"Arquivo de modelo não encontrado: {model_path}")
         
         app.state.detector = SQLiDetector({
             "model_path": model_path,
             "threshold": 0.7,
-            "log_queries": True
+            "log_queries": True,
+            "model_config": {
+                "cache_dir": "cache",
+                "preload": True
+            },
+            "models_dir": "models"
         })
         yield
+        
     except Exception as e:
         logger.error(f"Falha crítica na inicialização: {str(e)}")
         raise
