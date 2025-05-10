@@ -1,2 +1,0 @@
-[console_scripts]
-savm = savm.models.sqli_detector:run_api

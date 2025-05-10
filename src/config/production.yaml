@@ -1,9 +1,0 @@
-app:
-  environment: development
-  version: 1.0.0
-logging:
-  file: C:\apps\savm\src\logs\sqli_detector.log
-  level: INFO
-model:
-  path: C:\apps\savm\src\models\production\best_model.joblib
-  threshold: 0.7
