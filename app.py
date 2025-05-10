@@ -13,7 +13,7 @@ from src.sqli_detector import SQLIDetector
 from dto.QueryInput import QueryInputDTO
 from dto.DetectionResponse import DetectionResponseDTO
 
-MODELS_DIR = 'models' # Defina o diretório base dos modelos
+MODELS_DIR = 'models'
 LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
 MODEL_FILEPATH_TO_LOAD = None
 sqli_detector_instance = None 
@@ -42,14 +42,16 @@ if sqli_detector_instance:
     if sqli_detector_instance.is_trained():
         print("API: Modelo SQLi pré-treinado carregado com sucesso.")
     else:
-        print(f"API ERRO: Modelo carregado de '{MODEL_FILEPATH_TO_LOAD}', mas não está marcado como treinado! "
-              "Por favor, retreine usando model_train.py.")
+        print(f"API ERRO: Modelo carregado de '{MODEL_FILEPATH_TO_LOAD}', mas não está marcado como treinado! Por favor, retreine usando model_train.py.")
         sqli_detector_instance = None # Considera como não carregado
+
 elif MODEL_FILEPATH_TO_LOAD and not os.path.exists(MODEL_FILEPATH_TO_LOAD):
     pass
 else:
-     print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado. "
-           "Execute model_train.py para criar um modelo e o arquivo '{LATEST_MODEL_INFO_FILE}'.")
+    print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado. Execute model_train.py para criar um modelo e o arquivo '{LATEST_MODEL_INFO_FILE}'.")
+
+
+
 
 app = FastAPI(
     title="API de Detecção de SQL Injection e Formulários",
