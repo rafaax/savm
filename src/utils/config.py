@@ -58,9 +58,19 @@ class ConfigManager:
                 }
             },
             'logging': {
-                'level': 'INFO',
                 'file': 'logs/sqli_detector.log',
-                'max_size': '10MB'
+                'max_size': 10 * 1024 * 1024,  # 10MB
+                'backup_count': 5,
+                'level': 'INFO',
+                'email': {
+                    'enabled': False,
+                    'host': 'smtp.example.com',
+                    'port': 587,
+                    'from': 'alerts@sqli-detector.com',
+                    'to': ['devops@example.com'],
+                    'username': 'user',
+                    'password': 'pass'
+                }
             },
             'api': {
                 'enabled': True,
