@@ -255,32 +255,19 @@ class ModelManager:
             self.logger.error(f"Erro ao salvar modelo: {str(e)}")
             raise
 
-    def load_model(self, model_path: Union[str, Path]) -> Dict[str, Any]:
-        """
-        Carrega um modelo salvo.
+    def load_model(self, model_path):
+        model_path = Path(model_path)
         
-        Args:
-            model_path: Caminho para o diretório do modelo
-            
-        Returns:
-            Modelo e metadados carregados
-        """
-        try:
-            model_path = Path(model_path)
-            
-            model = joblib.load(model_path / 'model.joblib')
-            
-            with open(model_path / 'metadata.json') as f:
-                metadata = json.load(f)
-            
-            return {
-                'model': model,
-                'metadata': metadata
-            }
-            
-        except Exception as e:
-            self.logger.error(f"Erro ao carregar modelo: {str(e)}")
-            raise
+        # Verifica se é um arquivo .joblib diretamente
+        if model_path.suffix == '.joblib':
+            return joblib.load(model_path)
+        
+        # Verifica o caminho antigo (diretório + model.joblib)
+        model_file = model_path / 'model.joblib'
+        if model_file.exists():
+            return joblib.load(model_file)
+        
+        raise FileNotFoundError(f"Nenhum modelo encontrado em {model_path}")
 
     def get_feature_names(self) -> List[str]:
         """Retorna a lista de features usadas no modelo."""

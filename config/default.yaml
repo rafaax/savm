@@ -1,0 +1,3 @@
+model:
+  path: "models/production/best_model.joblib"
+  threshold: 0.7

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import pathlib
 
 here = pathlib.Path(__file__).parent.resolve()
-long_description = (here / "README.md").read_text(encoding="utf-8")
+long_description = (here / "README.md").read_text(encoding="utf-8") if (here / "README.md").exists() else ""
 
 setup(
     name="savm",
@@ -28,17 +28,26 @@ setup(
     ],
     keywords="security, sql injection, machine learning",
     package_dir={"": "src"},
-    packages=find_packages(where="src"),
+    packages=find_packages(where="src", exclude=["tests*"]),
     python_requires=">=3.8, <4",
     install_requires=[
         "pandas>=1.3.0",
         "scikit-learn>=1.0.0",
         "nltk>=3.6.0",
-        "matplotlib>=3.4.0",
         "wordcloud>=1.8.1",
+        "fastapi>=0.68.0",
+        "uvicorn>=0.15.0",
+        "pydantic>=1.8.0",
+        "seaborn>=0.12.0",
+        "matplotlib>=3.7.0",
     ],
     package_data={
-        "savm": ["data/*.csv", "config/*.json"],
+        "savm": ["data/*.csv", "config/*.json", "models/*.joblib"],
+    },
+    entry_points={
+        'console_scripts': [
+            'savm=savm.models.sqli_detector:run_api',
+        ],
     },
     project_urls={ 
         "Bug Reports": "https://github.com/rafaax/savm/issues",

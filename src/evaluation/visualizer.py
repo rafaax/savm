@@ -27,7 +27,11 @@ class ModelVisualizer:
 
     def _set_visualization_styles(self):
         """Configura estilos visuais consistentes para todos os gráficos."""
-        plt.style.use('seaborn')
+        try:
+            plt.style.use('seaborn')
+        except:
+            # Fallback para o estilo padrão mais recente
+            plt.style.use('default')
         sns.set_context("notebook")
         self.PALETTE = sns.color_palette("husl", 8)
         
