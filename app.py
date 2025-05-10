@@ -114,17 +114,14 @@ def get_db():
     finally:
         db.close()
 
+
+
+
+
 # --- Endpoints ---
 
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
-
-try:
-    app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-    print("API: Diretório estático '/assets' montado.")
-except RuntimeError as e:
-    print(f"API AVISO: Não foi possível montar o diretório estático 'assets': {e}. ")
-
-# --- Rotas Originais da sua Interface (JÁ ALINHADAS COM database.py MODIFICADO) ---
 @app.get("/", tags=["Interface"])
 async def root():
     if not os.path.exists("index.html"):
@@ -132,36 +129,37 @@ async def root():
     return FileResponse("index.html")
 
 @app.post("/submit-form", tags=["Formulário"])
-async def submit_form_endpoint(
-    request_data: Request,
-    db=Depends(get_db)
-):
+async def submit_form_endpoint(request_data: Request,db=Depends(get_db)):
     data = await request_data.json()
     # A query SQL já espera 'nome', 'email', 'cpf', 'endereco', 'date'
     query_sql = text("""
     INSERT INTO form (nome, email, cpf, endereco, date)
     VALUES (:name, :email, :cpf, :address, :date)
-    """) # Os placeholders :name, :email etc. são os nomes das chaves no dicionário de parâmetros
+    """)
+    
     try:
         db.execute(query_sql, {
-            "name": data.get('name'),       # Chave 'name' no JSON -> placeholder :name
-            "email": data.get('email'),     # Chave 'email' no JSON -> placeholder :email
-            "cpf": data.get('cpf'),         # Chave 'cpf' no JSON -> placeholder :cpf
-            "address": data.get('address'), # Chave 'address' no JSON -> placeholder :address
-            "date": datetime.now()          # Valor gerado -> placeholder :date
+            "name": data.get('name'),
+            "email": data.get('email'),
+            "cpf": data.get('cpf'),
+            "address": data.get('address'),
+            "date": datetime.now()
         })
+
         db.commit()
-        return {"status": "success", "data": {"name": data.get('name')}} # Retorna o 'name' do JSON
+
+        return {"status": "success", "data": {"name": data.get('name')}}
     except Exception as e:
-        import traceback
         print(f"API ERRO ao submeter formulário: {e}\n{traceback.format_exc()}")
-        db.rollback() # Importante adicionar rollback em caso de erro na transação
+        db.rollback() # rollback em caso de erro na transação
         raise HTTPException(status_code=500, detail=f"Erro ao processar o formulário: {str(e)}")
+
 
 @app.get("/search", tags=["Formulário"])
 async def search_endpoint(name: str = Query(""), db=Depends(get_db)):
     # A query SQL busca na coluna 'nome'
-    query_sql = text("SELECT * FROM form WHERE nome LIKE :name_pattern") # Coluna 'nome'
+
+    query_sql = text("SELECT * FROM form WHERE nome LIKE :name_pattern")
     try:
         result = db.execute(query_sql, {"name_pattern": f"%{name}%"})
         return [dict(row._mapping) for row in result]
