@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from pydantic import BaseModel
-from database import FormData, SessionLocal
+from database import FormData, SessionLocal, SQLiDetectionLog
 from datetime import datetime
 from src.sqli_detector import SQLIDetector
 from dto.QueryInput import QueryInputDTO
@@ -141,7 +141,6 @@ async def detect_sqli_endpoint(payload: QueryInputDTO):
         raise HTTPException(
             status_code=503, # Service Unavailable
             detail=f"Serviço de detecção de SQLi indisponível. Modelo não está treinado ou não foi carregado. "
-                   f"Verifique se '{MODEL_FILEPATH_TO_LOAD}' existe e foi gerado por model_train.py."
         )
     
     try:

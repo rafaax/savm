@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import Column, Integer, String, DateTime, create_engine # Adicionado DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, create_engine # Adicionado DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
@@ -26,8 +26,21 @@ class FormData(Base):
 
     def __repr__(self):
         return f"<FormData(id={self.id}, nome='{self.nome}', email='{self.email}')>"
+    
+
+
+class SQLiDetectionLog(Base):
+    __tablename__ = "sqli_detection_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    query_text = Column(String) # Usar String sem limite ou Text se seu DB suportar e precisar de queries longas
+    is_malicious_prediction = Column(Boolean)
+    prediction_label = Column(Integer) # 0 para benigno, 1 para malicioso
+
+
 
 Base.metadata.create_all(bind=engine)
 
 print(f"Banco de dados SQLite inicializado em: {DATABASE_URL}")
-print("Tabela 'FormData' (form) configurada com as colunas: id, nome, email, cpf, endereco, date")
+print("Tabelas configuradas: 'form', 'sqli_detection_logs'")
