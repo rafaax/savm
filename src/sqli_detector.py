@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from src.features_extractor import SQLIFeatureExtractor
 
 
@@ -35,11 +35,16 @@ class SQLIDetector:
         self.y_test_cache = None
         self.y_pred_cache = None
         self.df_cache = None
+        self._last_evaluation_data = None
+        
 
 
     def train(self, df_input: pd.DataFrame):
         """Treina o modelo completo e armazena informações necessárias para predição e análise."""
         
+        # REMOVA OU COMENTE A LINHA ABAIXO:
+        # self._initialize_components_if_needed() 
+
         try:
             if 'query' not in df_input.columns or 'label' not in df_input.columns:
                 raise ValueError("DataFrame de entrada deve conter colunas 'query' e 'label'")
@@ -60,60 +65,63 @@ class SQLIDetector:
             custom_features_data = df_features_extracted[self.custom_feature_names]
             
             # Fit e transform TF-IDF na 'query' original
-            X_tfidf_matrix = self.vectorizer.fit_transform(df_features_extracted['query'])
+            X_tfidf_matrix = self.vectorizer.fit_transform(df_features_extracted['query'].astype(str))
             self.tfidf_feature_names = self.vectorizer.get_feature_names_out().tolist()
 
-            # Preserva o índice original do df_features_extracted
             X_tfidf_df = pd.DataFrame(X_tfidf_matrix.toarray(), columns=self.tfidf_feature_names, index=df_features_extracted.index)
 
             # Fit e transform Scaler nas features customizadas
             scaled_custom_features_array = self.scaler.fit_transform(custom_features_data)
-
-            # Preserva o índice e nomes das colunas customizadas
             scaled_custom_features_df = pd.DataFrame(scaled_custom_features_array, columns=self.custom_feature_names, index=custom_features_data.index)
             
-            # Combina features TF-IDF e customizadas escalonadas
             X_combined = pd.concat([X_tfidf_df, scaled_custom_features_df], axis=1)
-            self.all_feature_names_ordered = X_combined.columns.tolist() # Armazena a ordem final das features
+            self.all_feature_names_ordered = X_combined.columns.tolist()
 
             y = df_features_extracted['label']
             
-            # Treinamento com preservação de índices para X_test, y_test
             X_train, X_test, y_train, y_test = train_test_split(
                 X_combined, y, test_size=0.3, random_state=42, stratify=y
             )
             
-            self.test_indices = X_test.index # df_features_extracted
+            self.test_indices = X_test.index.tolist()
             
             self.model.fit(X_train, y_train)
             y_pred_test = self.model.predict(X_test)
             
             self._is_trained = True
-            self.y_test_cache = y_test
-            self.y_pred_cache = y_pred_test
-            
-            accuracy = accuracy_score(y_test, y_pred_test)
-            
-            report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0) # zero_division=0 para evitar warnings se uma classe não tem predições/verdades no teste
-            conf_matrix = confusion_matrix(y_test, y_pred_test).tolist()
 
-            print(f"\nModelo Treinado. Acurácia: {accuracy:.4f}")
-            print("\nClassification Report (Treinamento):")
-            print(classification_report(y_test, y_pred_test, zero_division=0))
-            print("\nConfusion Matrix (Treinamento):")
-            print(confusion_matrix(y_test, y_pred_test))
+            # Preparar dados para get_last_evaluation_data
+            df_original_test_set = self.df_cache.loc[self.test_indices].copy() # Usa self.df_cache e self.test_indices
+            self._last_evaluation_data = (df_original_test_set, y_test.values, y_pred_test, self.test_indices) # y_test.values para array numpy
+
+            # Calcular métricas
+            accuracy = accuracy_score(y_test, y_pred_test)
+            precision = precision_score(y_test, y_pred_test, zero_division=0)
+            recall = recall_score(y_test, y_pred_test, zero_division=0)
+            f1 = f1_score(y_test, y_pred_test, zero_division=0)
+            
+            report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0)
+            conf_matrix_list = confusion_matrix(y_test, y_pred_test).tolist()
             
             return {
                 "accuracy": accuracy,
-                "classification_report": report_dict,
-                "confusion_matrix": conf_matrix
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1,
+                "classification_report_dict": report_dict,
+                "confusion_matrix_list": conf_matrix_list
             }
             
         except Exception as e:
+            # ... (bloco except como antes) ...
             self._is_trained = False
             print(f"Erro crítico durante o treinamento: {str(e)}")
             traceback.print_exc()
-            raise
+            return {
+                "accuracy": None, "precision": None, "recall": None, "f1_score": None,
+                "classification_report_dict": None, "confusion_matrix_list": None, "error": str(e)
+            }
+
 
 
 
@@ -184,9 +192,10 @@ class SQLIDetector:
     def get_last_evaluation_data(self):
         """Retorna os dados da última avaliação para análise de falsos negativos."""
 
-        if not self._is_trained or self.y_test_cache is None or self.y_pred_cache is None or self.test_indices is None or self.df_cache is None:
+        if not self._is_trained or self._last_evaluation_data is None:
+            print("WARN: Modelo não treinado ou dados de avaliação não disponíveis.")
             return None
-        return self.df_cache, self.y_test_cache, self.y_pred_cache, self.test_indices
+        return self._last_evaluation_data
     
 
 

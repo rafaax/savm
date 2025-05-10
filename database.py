@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = "sqlite:///./database/sqlite.db"
 
 if not DATABASE_URL:
     print("ERRO FATAL: A variável de ambiente 'DATABASE_URL' não está definida.")
@@ -62,13 +62,10 @@ class TrainedModelLog(Base):
     model_filename = Column(String, unique=True, index=True)
     model_path = Column(String) 
     dataset_used_path = Column(String, nullable=True)
-    
-    # Métricas de treinamento
     accuracy = Column(Float, nullable=True)
     precision = Column(Float, nullable=True)
     recall = Column(Float, nullable=True)
     f1_score = Column(Float, nullable=True)   
-
     false_negatives_count = Column(Integer, nullable=True)
     false_negatives_report_path = Column(String, nullable=True)
 

@@ -2,7 +2,7 @@ import pandas as pd
 from src.sqli_detector import SQLIDetector
 from src.analyzer import ResultAnalyzer
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from database import SessionLocal, TrainedModelLog
 from pathlib import Path 
 
@@ -44,18 +44,21 @@ def main():
     print(f"  Recall:   {current_recall:.4f}" if current_recall is not None else "  Recall: N/A")
     print(f"  F1-Score: {current_f1_score:.4f}" if current_f1_score is not None else "  F1-Score: N/A")
 
-    # --- GERAÇÃO DINÂMICA DO NOME DO ARQUIVO DO MODELO ---
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_filename = f"sqli_detector_model_{timestamp}.joblib"
+    timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    model_filename = f"sqli_detector_model_{timestamp_str}.joblib"
     current_model_save_path = os.path.join(MODELS_DIR, model_filename)
     
     print(f"\nSalvando o modelo treinado em {current_model_save_path}...")
     detector.save_model(current_model_save_path)
 
     latest_model_info_file = os.path.join(MODELS_DIR, "latest_model_info.txt")
-    with open(latest_model_info_file, "w") as f:
-        f.write(model_filename)
-    print(f"Informação do último modelo ('{model_filename}') salva em '{latest_model_info_file}'")
+    
+    try:
+        with open(latest_model_info_file, "w") as f:
+            f.write(model_filename)
+        print(f"Informação do último modelo ('{model_filename}') salva em '{latest_model_info_file}'")
+    except Exception as e:
+        print(f"ERRO ao salvar informação do último modelo: {e}")
 
 
     
@@ -64,30 +67,62 @@ def main():
     
     if evaluation_data:
         df_original_for_analysis, y_test_cached, y_pred_cached, test_indices_cached = evaluation_data
+
         analyzer = ResultAnalyzer()
+
         fn_df, analysis_details = analyzer.analyze_false_negatives(
             df_original_for_analysis, 
             y_test_cached, 
             y_pred_cached, 
             test_indices_cached,
             RESULTS_DIR,
-            timestamp
+            timestamp_str
         )
         
         if fn_df is not None and not fn_df.empty:
-            # Salva análise com timestamp também para corresponder ao modelo
-            fn_analysis_filename = f"false_negatives_analysis_{timestamp}.csv"
-            output_csv_path = os.path.join(RESULTS_DIR, fn_analysis_filename)
-            fn_df.to_csv(output_csv_path, index=False)
-            print(f"\nFalsos negativos ({len(fn_df)}) salvos em '{output_csv_path}'")
+            fn_count = len(fn_df)
+            fn_analysis_filename = f"false_negatives_analysis_{timestamp_str}.csv"
+            fn_report_file_path  = os.path.join(RESULTS_DIR, fn_analysis_filename)
+            fn_df.to_csv(fn_report_file_path, index=False)
+            print(f"\nFalsos negativos ({fn_count}) salvos em '{fn_report_file_path}'")
             
-            if analysis_details:
-                print("Detalhes da Análise de Falsos Negativos:")
-                # ... (impressão dos detalhes da análise)
+
         else:
             print("\nNenhum falso negativo encontrado ou análise não pôde ser realizada.")
     else:
         print("\nNenhum dado de avaliação disponível no detector para análise de falsos negativos.")
+
+
+
+    print("\nRegistrando informações do modelo treinado no banco de dados...")
+    db_session = None
+    try:
+        db_session = SessionLocal()
+        
+        new_model_log = TrainedModelLog(
+            model_filename=model_filename,
+            model_path=str(Path(current_model_save_path).resolve()),
+            dataset_used_path=str(Path(DATASET_PATH).resolve()),
+            accuracy=current_accuracy,
+            precision=current_precision,
+            recall=current_recall,
+            f1_score=current_f1_score,            
+            false_negatives_count=fn_count,
+            false_negatives_report_path=str(Path(fn_report_file_path).resolve()) if fn_report_file_path else None,
+            notes=f"Modelo treinado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}."
+        )
+        db_session.add(new_model_log)
+        db_session.commit()
+        db_session.refresh(new_model_log)
+        print(f"Modelo '{new_model_log.model_filename}' (ID: {new_model_log.id}) registrado com sucesso no banco de dados.")
+
+    except Exception as e:
+        print(f"ERRO ao registrar informações do modelo no banco de dados: {e}")
+        if db_session:
+            db_session.rollback()
+    finally:
+        if db_session:
+            db_session.close()
 
 if __name__ == "__main__":
     main()
