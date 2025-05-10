@@ -8,7 +8,6 @@ class ResultAnalyzer:
     def analyze_false_negatives(df, y_test, y_pred, test_indices, results_dir: str, timestamp: str): # Novos parâmetros
         """
         Analisa falsos negativos detalhadamente, retorna o DataFrame e os detalhes da análise.
-        Salva o plot da distribuição de comprimentos.
         """
         
         analysis_details = {
