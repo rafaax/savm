@@ -126,37 +126,47 @@ class SQLiDetector:
             return pd.DataFrame()
     
     def detect(self, query: str, metadata: Optional[Dict] = None) -> Dict[str, Any]:
-        """Analisa uma query SQL e retorna resultados da detecção."""
+        """Versão com tratamento robusto de erros"""
         result = {
             'is_sqli': False,
             'probability': 0.0,
             'features': {},
             'metadata': metadata or {},
-            'model_version': self.config.get('model_version', '1.0.0')
+            'model_version': self.config.get('model_version', '1.0.0'),
+            'error': None
         }
         
         try:
+            if not query or not isinstance(query, str):
+                raise ValueError("Query inválida ou vazia")
+                
             if not hasattr(self, 'model'):
-                raise RuntimeError("Nenhum modelo carregado")
+                raise RuntimeError("Modelo não carregado")
             
-            features = self.extract_features(query)
-            proba = self.model['model'].predict_proba(features)[0][1]
-            is_sqli = proba >= self.config.get('threshold', 0.5)
-            
-            result.update({
-                'is_sqli': is_sqli,
-                'probability': proba,
-                'features': self._get_top_features(features),
-                'feature_vector': features.iloc[0].to_dict()
-            })
-            
-            if self.config.get('log_queries', True):
-                self._log_detection(query, result, metadata)
+            # Extração de features com fallback
+            try:
+                features = self.extract_features(query)
+                if features.empty:
+                    raise ValueError("Falha na extração de features")
+            except Exception as e:
+                logger.warning(f"Falha na extração: {str(e)}")
+                features = pd.DataFrame({'query': [query]})
+                
+            # Predição segura
+            try:
+                proba = self.model['model'].predict_proba(features)[0][1]
+                result.update({
+                    'is_sqli': proba >= self.config.get('threshold', 0.5),
+                    'probability': proba
+                })
+            except Exception as e:
+                logger.error(f"Falha na predição: {str(e)}")
+                result['error'] = "Falha na análise"
                 
         except Exception as e:
-            logger.error(f"Erro na detecção: {str(e)}")
-            raise
-        
+            logger.critical(f"Erro crítico: {str(e)}", exc_info=True)
+            result['error'] = str(e)
+            
         return result
     
     def _get_top_features(self, features: pd.DataFrame) -> Dict[str, float]:
@@ -234,13 +244,18 @@ app = FastAPI(
 @app.post("/detect", response_model=DetectionResponse)
 async def detect_sqli(request: Request, query_req: QueryRequest):
     try:
+        logger.info(f"Iniciando análise para query: {query_req.query[:50]}...")
+        
         detector = request.app.state.detector
+        
         metadata = {
             "source_ip": query_req.source_ip or request.client.host,
             "user_agent": query_req.user_agent or request.headers.get("user-agent")
         }
         
+        logger.debug("Extraindo features...")
         result = detector.detect(query_req.query, metadata)
+        logger.info(f"Análise concluída - SQLi: {result['is_sqli']} (Prob: {result['probability']:.2f})")
         
         return {
             "is_sqli": result["is_sqli"],
@@ -249,9 +264,13 @@ async def detect_sqli(request: Request, query_req: QueryRequest):
             "model_version": result["model_version"],
             "session_id": query_req.session_id
         }
+        
     except Exception as e:
-        logger.error(f"Erro na API: {str(e)}")
-        raise HTTPException(status_code=500, detail="Erro interno na análise")
+        logger.error("Erro detalhado:", exc_info=True)  # Isso logará o traceback completo
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro interno: {str(e)}" if config.get("debug") else "Erro interno na análise"
+        )
 
 def run_api(host: str = "0.0.0.0", port: int = 8000):
     """Inicia o servidor da API."""
