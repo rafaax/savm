@@ -48,10 +48,14 @@ class SQLiDetectionLog(Base):
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     query_text = Column(String) 
     is_malicious_prediction = Column(Boolean)
-    prediction_label = Column(Integer) # 0 para queries nao maliciosas, 1 para queries maliciosas
+    prediction_label = Column(Integer)
+    probability_benign = Column(Float)
+    probability_malicious = Column(Float)
 
-    def __repr__(self): # para melhor debug  -> nao fica aparecendo o endereço de memoria
-        return f"<SQLiDetectionLog(id={self.id}, query='{self.query_text[:50]}...', malicious={self.is_malicious_prediction})>"
+    def __repr__(self):
+        return (f"<SQLiDetectionLog(id={self.id}, query='{self.query_text[:30]}...', "
+                f"malicious={self.is_malicious_prediction}, label={self.prediction_label}, "
+                f"prob_benign={self.probability_benign:.4f}, prob_malicious={self.probability_malicious:.4f})>")
 
 
 class TrainedModelLog(Base):
