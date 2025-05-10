@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 from sqlalchemy import create_engine
 
-DATABASE_URL = "sqlite:///./sql/database.db"  # relative path to the root
+DATABASE_URL = "sqlite:///./database/sqlite.db"  # relative path to the root
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
