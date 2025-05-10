@@ -23,8 +23,6 @@ class SQLIFeatureExtractor:
         }
 
     def extract_features(self, df):
-        """Extrai todas as features de SQL injection"""
-        
         # Pré-processamento básico
         df['query'] = df['query'].str.lower()
         df['query_length'] = df['query'].str.len()
@@ -56,7 +54,7 @@ class SQLIFeatureExtractor:
         df['quote_count'] = df['query'].str.count("'")
         df['special_char_count'] = df['query'].str.count(r"[\"#%&|;=()]")
         
-        # Features para falsos negativos
+        # Features para aprimorar detecção de falsos negativos
         df['has_union_fragments'] = df['query'].str.contains(self.patterns['union_fragments']).astype(int)
         df['has_oracle_exploits'] = df['query'].str.contains(self.patterns['oracle_exploits']).astype(int)
         df['has_char_encoding'] = df['query'].str.contains(self.patterns['char_encoding']).astype(int)
