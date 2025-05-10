@@ -100,30 +100,10 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
     """
     Detecta se uma query é maliciosa ou não.
     """
+
     global sqli_detector_instance
 
     if not sqli_detector_instance or not sqli_detector_instance.is_trained():
-        # Log da tentativa de uso com modelo indisponível
-        try:
-            # Não temos uma predição, então alguns campos serão None ou um código de erro
-            log_model_unavailable = SQLiDetectionLog(
-                query_text=payload.query,
-                is_malicious_prediction=None, # Predição não pôde ser feita
-                prediction_label=-1, # Código para modelo indisponível/não treinado
-                probability_benign=None,
-                probability_malicious=None
-            )
-            db.add(log_model_unavailable)
-            db.commit()
-        except Exception as log_err:
-            print(f"API ERRO CRÍTICO: Falha ao logar tentativa com modelo indisponível: {log_err}")
-            # Não há muito o que fazer aqui se o log de erro falhar, apenas imprimir.
-            # A sessão pode já estar ruim, então um rollback aqui é uma boa ideia.
-            try:
-                db.rollback()
-            except Exception: # Ignorar erros no rollback, pois já estamos em uma situação de erro.
-                pass
-        
         raise HTTPException(status_code=503, detail="Serviço de detecção de SQLi indisponível. Modelo não treinado ou não carregado.")
 
     try:
@@ -137,63 +117,33 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
             probability_malicious=float(prediction["probability_malicious"])
         )
         db.add(new_log_entry)
-        db.commit() # Ponto principal onde um erro de DB pode ocorrer (como o de tipo que você teve)
+        db.commit()
 
         return prediction
 
     except RuntimeError as e: # Captura erros específicos do modelo, como "Modelo não treinado" durante a predição
         print(f"API ALERTA: RuntimeError durante a predição do modelo: {e}\n{traceback.format_exc()}")
-        # Se o commit anterior (no bloco try principal) falhou, a sessão está ruim.
-        # É mais seguro fazer rollback antes de tentar logar o erro.
         try:
             db.rollback() # Garante que a sessão está limpa antes de tentar nova transação
-            log_failure_entry = SQLiDetectionLog(
-                query_text=payload.query,
-                is_malicious_prediction=None, # Predição não pôde ser feita
-                prediction_label=-2, # Código para erro de runtime do modelo
-                probability_benign=None,
-                probability_malicious=None
-            )
-            db.add(log_failure_entry)
-            db.commit()
         except Exception as log_err:
             print(f"API ERRO CRÍTICO: Falha ao logar erro de runtime na detecção (após rollback): {log_err}")
-            # Se mesmo após o rollback o log falhar, a sessão ou DB pode estar com problemas sérios.
-            # Um rollback final aqui pode ser tentado, mas o principal é a notificação.
             try:
                 db.rollback()
             except Exception:
                 pass
-        
         raise HTTPException(status_code=503, detail=f"Erro no serviço de detecção: {str(e)}")
 
     except Exception as e: # Captura qualquer outra exceção durante a predição ou o primeiro commit
-        # Esta exceção pode ser um erro de banco de dados do primeiro db.commit()
-        # ou um erro inesperado em sqli_detector_instance.predict_single()
         print(f"API ERRO: Exceção inesperada durante a predição ou log inicial: {e}\n{traceback.format_exc()}")
         
-        # É crucial fazer rollback aqui, pois o db.commit() no bloco try principal pode ter falhado,
-        # deixando a sessão em um estado inconsistente.
         try:
             db.rollback() # Limpa a sessão antes de tentar logar o erro.
-            log_exception_entry = SQLiDetectionLog(
-                query_text=payload.query,
-                is_malicious_prediction=None, # Predição não pôde ser feita ou logá-la falhou
-                prediction_label=-3, # Código para exceção geral
-                probability_benign=None,
-                probability_malicious=None
-            )
-            db.add(log_exception_entry)
-            db.commit()
         except Exception as log_err:
             print(f"API ERRO CRÍTICO: Falha ao logar exceção geral na detecção (após rollback): {log_err}")
-            # Rollback final em caso de falha no log do erro.
             try:
                 db.rollback()
             except Exception:
                 pass
-        
-        # Para o cliente, uma mensagem genérica é mais segura para erros 500.
         raise HTTPException(status_code=500, detail="Erro interno do servidor durante o processamento da sua requisição.")
 
 
