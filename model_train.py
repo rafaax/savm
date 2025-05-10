@@ -3,6 +3,8 @@ from src.sqli_detector import SQLIDetector
 from src.analyzer import ResultAnalyzer
 import os
 from datetime import datetime
+from database import SessionLocal, TrainedModelLog
+from pathlib import Path 
 
 MODELS_DIR = 'models'
 DATASET_PATH = 'mocks/dataset.csv'
@@ -30,9 +32,17 @@ def main():
     if not detector.is_trained() or not training_metrics:
         print("Falha no treinamento do modelo. Abortando.")
         return
+    
+    current_accuracy = training_metrics.get('accuracy')
+    current_precision = training_metrics.get('precision')
+    current_recall = training_metrics.get('recall')
+    current_f1_score = training_metrics.get('f1_score')
 
     print("\nMétricas de Treinamento:")
-    print(f"  Acurácia: {training_metrics.get('accuracy', 'N/A'):.4f}")
+    print(f"  Acurácia: {current_accuracy:.4f}" if current_accuracy is not None else "  Acurácia: N/A")
+    print(f"  Precisão: {current_precision:.4f}" if current_precision is not None else "  Precisão: N/A")
+    print(f"  Recall:   {current_recall:.4f}" if current_recall is not None else "  Recall: N/A")
+    print(f"  F1-Score: {current_f1_score:.4f}" if current_f1_score is not None else "  F1-Score: N/A")
 
     # --- GERAÇÃO DINÂMICA DO NOME DO ARQUIVO DO MODELO ---
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float,  create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
@@ -54,8 +54,33 @@ class SQLiDetectionLog(Base):
         return f"<SQLiDetectionLog(id={self.id}, query='{self.query_text[:50]}...', malicious={self.is_malicious_prediction})>"
 
 
+class TrainedModelLog(Base):
+    __tablename__ = "trained_model_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    training_timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    model_filename = Column(String, unique=True, index=True)
+    model_path = Column(String) 
+    dataset_used_path = Column(String, nullable=True)
+    
+    # Métricas de treinamento
+    accuracy = Column(Float, nullable=True)
+    precision = Column(Float, nullable=True)
+    recall = Column(Float, nullable=True)
+    f1_score = Column(Float, nullable=True)   
+
+    false_negatives_count = Column(Integer, nullable=True)
+    false_negatives_report_path = Column(String, nullable=True)
+
+    notes = Column(Text, nullable=True)
+
+    def __repr__(self):
+        return (f"<TrainedModelLog(id={self.id}, filename='{self.model_filename}', "
+                f"accuracy={self.accuracy:.4f if self.accuracy is not None else 'N/A'}, "
+                f"f1_score={self.f1_score:.4f if self.f1_score is not None else 'N/A'})>") # __repr__ atualizado
+
 
 Base.metadata.create_all(bind=engine)
 
 print(f"Banco de dados SQLite inicializado em: {DATABASE_URL}")
-print("Tabelas configuradas: 'form', 'sqli_detection_logs'")
+print(f"Tabelas configuradas: {', '.join(Base.metadata.tables.keys())}")
