@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 from datetime import datetime, timezone
-from dotenv import load_dotenv # Importar dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -74,7 +74,7 @@ class TrainedModelLog(Base):
     def __repr__(self):
         return (f"<TrainedModelLog(id={self.id}, filename='{self.model_filename}', "
                 f"accuracy={self.accuracy:.4f if self.accuracy is not None else 'N/A'}, "
-                f"f1_score={self.f1_score:.4f if self.f1_score is not None else 'N/A'})>") # __repr__ atualizado
+                f"f1_score={self.f1_score:.4f if self.f1_score is not None else 'N/A'})>")
 
 
 Base.metadata.create_all(bind=engine)

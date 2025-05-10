@@ -18,19 +18,20 @@ def main():
 
     try:
         df = pd.read_csv(DATASET_PATH)
-        print(f"Dados carregados de {DATASET_PATH}. Total: {len(df)} registros")
+        print(f"Dados carregados do dataset:  {DATASET_PATH}")
+        print(f"Quantidade de dados: {len(df)} registros")
         print(f"Distribuição de classes:\n{df['label'].value_counts(normalize=True)}")
     except Exception as e:
-        print(f"Erro ao carregar dados: {e}")
+        print(f"Erro ao carregar dados do dataset: {e}")
         return
     
-    detector = SQLIDetector()
-    print("\nIniciando treinamento do modelo SQLIDetector...")
+    detector = SQLIDetector() # instanciando a classe
+    print("\nIniciando treinamento do modelo")
     
     training_metrics = detector.train(df)
     
     if not detector.is_trained() or not training_metrics:
-        print("Falha no treinamento do modelo. Abortando.")
+        print("Falha no treinamento do modelo :(")
         return
     
     current_accuracy = training_metrics.get('accuracy')
@@ -48,7 +49,6 @@ def main():
     model_filename = f"sqli_detector_model_{timestamp_str}.joblib"
     current_model_save_path = os.path.join(MODELS_DIR, model_filename)
     
-    print(f"\nSalvando o modelo treinado em {current_model_save_path}...")
     detector.save_model(current_model_save_path)
 
     latest_model_info_file = os.path.join(MODELS_DIR, "latest_model_info.txt")
@@ -56,7 +56,6 @@ def main():
     try:
         with open(latest_model_info_file, "w") as f:
             f.write(model_filename)
-        print(f"Informação do último modelo ('{model_filename}') salva em '{latest_model_info_file}'")
     except Exception as e:
         print(f"ERRO ao salvar informação do último modelo: {e}")
 
@@ -84,8 +83,6 @@ def main():
             fn_analysis_filename = f"false_negatives_analysis_{timestamp_str}.csv"
             fn_report_file_path  = os.path.join(RESULTS_DIR, fn_analysis_filename)
             fn_df.to_csv(fn_report_file_path, index=False)
-            print(f"\nFalsos negativos ({fn_count}) salvos em '{fn_report_file_path}'")
-            
 
         else:
             print("\nNenhum falso negativo encontrado ou análise não pôde ser realizada.")
@@ -114,10 +111,10 @@ def main():
         db_session.add(new_model_log)
         db_session.commit()
         db_session.refresh(new_model_log)
-        print(f"Modelo '{new_model_log.model_filename}' (ID: {new_model_log.id}) registrado com sucesso no banco de dados.")
+        print(f"Modelo '{new_model_log.model_filename}' salvo no banco de dados.")
 
     except Exception as e:
-        print(f"ERRO ao registrar informações do modelo no banco de dados: {e}")
+        print(f"ERRO AO REGISTRAR AS INFORMAÇÕES DO MODELO TREINADO NO DB: {e}")
         if db_session:
             db_session.rollback()
     finally:

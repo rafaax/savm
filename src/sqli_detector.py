@@ -42,9 +42,6 @@ class SQLIDetector:
     def train(self, df_input: pd.DataFrame):
         """Treina o modelo completo e armazena informações necessárias para predição e análise."""
         
-        # REMOVA OU COMENTE A LINHA ABAIXO:
-        # self._initialize_components_if_needed() 
-
         try:
             if 'query' not in df_input.columns or 'label' not in df_input.columns:
                 raise ValueError("DataFrame de entrada deve conter colunas 'query' e 'label'")
@@ -99,10 +96,10 @@ class SQLIDetector:
             precision = precision_score(y_test, y_pred_test, zero_division=0)
             recall = recall_score(y_test, y_pred_test, zero_division=0)
             f1 = f1_score(y_test, y_pred_test, zero_division=0)
-            
             report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0)
             conf_matrix_list = confusion_matrix(y_test, y_pred_test).tolist()
             
+            # retorna todas métricas necessarias para a aplicação
             return {
                 "accuracy": accuracy,
                 "precision": precision,
@@ -113,7 +110,7 @@ class SQLIDetector:
             }
             
         except Exception as e:
-            # ... (bloco except como antes) ...
+
             self._is_trained = False
             print(f"Erro crítico durante o treinamento: {str(e)}")
             traceback.print_exc()
