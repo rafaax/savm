@@ -129,7 +129,7 @@ async def search_endpoint(name: str = Query(""), db=Depends(get_db)):
 
 
 @app.post("/detect-sqli", response_model=DetectionResponseDTO, tags=["Detecção SQLi"])
-async def detect_sqli_endpoint(payload: QueryInputDTO):
+async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
     """
     Detecta se uma query SQL fornecida é maliciosa.
     Requer um modelo pré-treinado (`models/sqli_detector_model.joblib`).
@@ -146,6 +146,15 @@ async def detect_sqli_endpoint(payload: QueryInputDTO):
     try:
         prediction = sqli_detector_instance.predict_single(payload.query)
         is_malicious = bool(prediction == 1)
+
+        log_entry = SQLiDetectionLog(
+            query_text=payload.query,
+            is_malicious_prediction=is_malicious,
+            prediction_label=prediction
+        )
+        db.add(log_entry)
+        db.commit()
+
         return DetectionResponseDTO(
             query=payload.query,
             is_malicious=is_malicious,
@@ -153,9 +162,32 @@ async def detect_sqli_endpoint(payload: QueryInputDTO):
         )
     
     except RuntimeError as e: # Captura "Modelo não treinado" se is_trained() falhar por algum motivo
+        try:
+            log_failure_entry = SQLiDetectionLog(
+                query_text=payload.query,
+                is_malicious_prediction=None,
+                prediction_label=-2 # Código para erro de modelo
+            )
+            db.add(log_failure_entry)
+            db.commit()
+        except Exception as log_err:
+            print(f"API ERRO: Falha ao logar erro de runtime na detecção: {log_err}")
+            db.rollback()
         raise HTTPException(status_code=503, detail=f"Erro interno do modelo: {str(e)}")
     
     except Exception as e:
+        try:
+            log_exception_entry = SQLiDetectionLog(
+                query_text=payload.query,
+                is_malicious_prediction=None,
+                prediction_label=-3 # Código para exceção geral
+            )
+            db.add(log_exception_entry)
+            db.commit()
+        except Exception as log_err:
+            print(f"API ERRO: Falha ao logar exceção na detecção: {log_err}")
+            db.rollback()
+
         print(f"API: Erro durante a predição: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Erro interno durante a predição: {str(e)}")
 
