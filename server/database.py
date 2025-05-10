@@ -1,13 +1,12 @@
+import os
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 from pathlib import Path
 from sqlalchemy import create_engine
 
-DATABASE_URL = "sqlite:///./database/sqlite.db"  # relative path to the root
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(os.getenv("DATABASE_URL"), connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
 Base = declarative_base()
 
