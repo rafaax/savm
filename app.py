@@ -118,17 +118,14 @@ async def search_endpoint(name: str = Query(""), db=Depends(get_db)):
 @app.post("/detect-sqli", response_model=DetectionResponseDTO, tags=["Detecção SQLi"])
 async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
     """
-    Detecta se uma query SQL fornecida é maliciosa.
-    Requer um modelo pré-treinado (`models/sqli_detector_model.joblib`).
+    Detecta se uma query é maliciosa ou não.
     """
 
     global sqli_detector_instance
 
     if not sqli_detector_instance or not sqli_detector_instance.is_trained():
-        raise HTTPException(
-            status_code=503, # Service Unavailable
-            detail=f"Serviço de detecção de SQLi indisponível. Modelo não está treinado ou não foi carregado. "
-        )
+        # Service Unavailable
+        raise HTTPException(status_code=503, detail=f"Serviço de detecção de SQLi indisponível. Modelo não está treinado ou não foi carregado. ")
     
     try:
         prediction = sqli_detector_instance.predict_single(payload.query)
