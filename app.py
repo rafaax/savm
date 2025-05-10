@@ -26,26 +26,44 @@ except ImportError as e:
         def close(self): pass
     def SessionLocal(): return MockSession()
 
-MODEL_FILEPATH = 'models/sqli_detector_model.joblib' # Caminho onde o modelo treinado DEVE estar
+MODELS_DIR = 'models' # Defina o diretório base dos modelos
+LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
+MODEL_FILEPATH_TO_LOAD = None
+sqli_detector_instance = None 
 
-# --- Carregar o Modelo SQLi na Inicialização ---
-print(f"API: Tentando carregar o modelo SQLi de: {MODEL_FILEPATH}")
-sqli_detector_instance = SQLIDetector.load_model(MODEL_FILEPATH)
+if os.path.exists(LATEST_MODEL_INFO_FILE):
+    try:
+        with open(LATEST_MODEL_INFO_FILE, "r") as f:
+            latest_model_filename = f.read().strip()
+        if latest_model_filename:
+            MODEL_FILEPATH_TO_LOAD = os.path.join(MODELS_DIR, latest_model_filename)
+            print(f"API: Informação do último modelo encontrada: '{latest_model_filename}'")
+            print(f"API: Tentando carregar o modelo SQLi de: {MODEL_FILEPATH_TO_LOAD}")
+            if os.path.exists(MODEL_FILEPATH_TO_LOAD):
+                sqli_detector_instance = SQLIDetector.load_model(MODEL_FILEPATH_TO_LOAD)
+            else:
+                print(f"API ERRO: Arquivo do modelo '{MODEL_FILEPATH_TO_LOAD}' (indicado como o mais recente) não encontrado.")
+        else:
+            print(f"API AVISO: Arquivo '{LATEST_MODEL_INFO_FILE}' está vazio.")
+    except Exception as e:
+        print(f"API AVISO: Erro ao ler '{LATEST_MODEL_INFO_FILE}': {e}")
+else:
+    print(f"API AVISO: Arquivo de informação do último modelo ('{LATEST_MODEL_INFO_FILE}') não encontrado. Não é possível carregar um modelo específico.")
 
+# Verifica se o modelo foi carregado e está treinado
 if sqli_detector_instance:
     if sqli_detector_instance.is_trained():
         print("API: Modelo SQLi pré-treinado carregado com sucesso.")
     else:
-        # Isso é um problema, pois a API não terá como treinar.
-        print("API ERRO: Modelo carregado de '{MODEL_FILEPATH}', mas não está marcado como treinado! "
+        print(f"API ERRO: Modelo carregado de '{MODEL_FILEPATH_TO_LOAD}', mas não está marcado como treinado! "
               "Por favor, retreine usando model_train.py.")
-        # Tratar como não carregado efetivamente
-        sqli_detector_instance = None 
+        sqli_detector_instance = None # Considera como não carregado
+elif MODEL_FILEPATH_TO_LOAD and not os.path.exists(MODEL_FILEPATH_TO_LOAD):
+    # Se tentamos carregar um arquivo específico mas ele não existia (já logado acima).
+    pass
 else:
-    print(f"API ERRO: Nenhum modelo pré-treinado encontrado em '{MODEL_FILEPATH}' ou falha ao carregar. "
-          "A API não poderá fazer detecções de SQLi até que um modelo válido seja fornecido. "
-          "Execute model_train.py para criar o arquivo do modelo.")
-    # sqli_detector_instance já será None
+     print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado. "
+           "Execute model_train.py para criar um modelo e o arquivo '{LATEST_MODEL_INFO_FILE}'.")
 
 app = FastAPI(
     title="API de Detecção de SQL Injection e Formulários",
@@ -166,7 +184,7 @@ async def detect_sqli_endpoint(payload: QueryInput):
         raise HTTPException(
             status_code=503, # Service Unavailable
             detail=f"Serviço de detecção de SQLi indisponível. Modelo não está treinado ou não foi carregado. "
-                   f"Verifique se '{MODEL_FILEPATH}' existe e foi gerado por model_train.py."
+                   f"Verifique se '{MODEL_FILEPATH_TO_LOAD}' existe e foi gerado por model_train.py."
         )
     
     try:
