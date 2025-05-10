@@ -1,30 +1,42 @@
 import os
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, create_engine # Adicionado DateTime
+import sys
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
-from datetime import datetime 
-db_dir = Path("database")
-db_dir.mkdir(parents=True, exist_ok=True)
+from datetime import datetime, timezone
+from dotenv import load_dotenv # Importar dotenv
 
-db_path = db_dir / "sqlite.db"
-DATABASE_URL = f"sqlite:///{db_path.resolve()}" # Usar caminho absoluto resolvido
+load_dotenv()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    print("ERRO FATAL: A variável de ambiente 'DATABASE_URL' não está definida.")
+    sys.exit(1)
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False) # autocommit=False é default
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False) 
 Base = declarative_base()
 
 class FormData(Base):
-    __tablename__ = "form" # Nome da tabela é 'form'
-
+    __tablename__ = "form" 
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String, index=True) # Era 'name', mudado para 'nome'
-    email = Column(String, index=True) # Adicionado index=True para email, pode ser útil
-    cpf = Column(String, unique=True, index=True) # Adicionado CPF, geralmente é único
-    endereco = Column(String) # Adicionado Endereço
-    date = Column(DateTime, default=datetime.utcnow) # Adicionado campo de data com valor default
+    nome = Column(String, index=True) 
+    email = Column(String, index=True)
+    cpf = Column(String, unique=True, index=True) 
+    endereco = Column(String) 
+    date =  Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    def __repr__(self):
+    def __repr__(self): # para melhor debug -> nao fica aparecendo o endereço de memoria
         return f"<FormData(id={self.id}, nome='{self.nome}', email='{self.email}')>"
     
 
@@ -33,10 +45,13 @@ class SQLiDetectionLog(Base):
     __tablename__ = "sqli_detection_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
-    query_text = Column(String) # Usar String sem limite ou Text se seu DB suportar e precisar de queries longas
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    query_text = Column(String) 
     is_malicious_prediction = Column(Boolean)
-    prediction_label = Column(Integer) # 0 para benigno, 1 para malicioso
+    prediction_label = Column(Integer) # 0 para queries nao maliciosas, 1 para queries maliciosas
+
+    def __repr__(self): # para melhor debug  -> nao fica aparecendo o endereço de memoria
+        return f"<SQLiDetectionLog(id={self.id}, query='{self.query_text[:50]}...', malicious={self.is_malicious_prediction})>"
 
 
 

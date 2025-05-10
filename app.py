@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from pydantic import BaseModel
-from database import FormData, SessionLocal, SQLiDetectionLog
+from database import FormData, SessionLocal, SQLiDetectionLog, get_db
 from datetime import datetime
 from src.sqli_detector import SQLIDetector
 from dto.QueryInput import QueryInputDTO
@@ -46,7 +46,6 @@ if sqli_detector_instance:
               "Por favor, retreine usando model_train.py.")
         sqli_detector_instance = None # Considera como não carregado
 elif MODEL_FILEPATH_TO_LOAD and not os.path.exists(MODEL_FILEPATH_TO_LOAD):
-    # Se tentamos carregar um arquivo específico mas ele não existia (já logado acima).
     pass
 else:
      print(f"API ERRO: Nenhum modelo SQLi pôde ser carregado. "
@@ -58,28 +57,17 @@ app = FastAPI(
     version="1.0.1"
 )
 
-# --- Middleware CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Restrinja em produção
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-
 app.mount("/assets", StaticFiles(directory="assets"), name="assets") # definindo a pasta assets para acessar pela tela do formulario
 
 # --- Endpoints ---
-
 @app.get("/", tags=["Interface"])
 async def root():
     if not os.path.exists("index.html"):
