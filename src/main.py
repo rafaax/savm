@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 # Importações internas
 from data.data_loader import DataLoader
 from features.sqli_features import SQLFeatureExtractor
-from models.sql_detector import SQLInjectionDetector
+from models.sqli_detector import SQLInjectionDetector
 from evaluation.evaluator import ModelEvaluator
 from utils.config import load_config
 
