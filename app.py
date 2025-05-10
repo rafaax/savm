@@ -1,7 +1,6 @@
 import os
 import traceback
 import uvicorn
-
 from fastapi import FastAPI, Query, Request, HTTPException, Form, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
@@ -12,6 +11,7 @@ from database import FormData, SessionLocal
 from datetime import datetime
 from src.sqli_detector import SQLIDetector
 from dto.QueryInput import QueryInputDTO
+from dto.DetectionResponse import DetectionResponseDTO
 
 MODELS_DIR = 'models' # Defina o diretório base dos modelos
 LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
@@ -128,7 +128,7 @@ async def search_endpoint(name: str = Query(""), db=Depends(get_db)):
 
 
 
-@app.post("/detect-sqli", response_model=DetectionResponse, tags=["Detecção SQLi"])
+@app.post("/detect-sqli", response_model=DetectionResponseDTO, tags=["Detecção SQLi"])
 async def detect_sqli_endpoint(payload: QueryInputDTO):
     """
     Detecta se uma query SQL fornecida é maliciosa.
@@ -147,7 +147,7 @@ async def detect_sqli_endpoint(payload: QueryInputDTO):
     try:
         prediction = sqli_detector_instance.predict_single(payload.query)
         is_malicious = bool(prediction == 1)
-        return DetectionResponse(
+        return DetectionResponseDTO(
             query=payload.query,
             is_malicious=is_malicious,
             prediction_label=prediction
