@@ -8,11 +8,9 @@ from typing import Optional, Dict, Any, List
 import os
 from database import FormData, SessionLocal
 from datetime import datetime
-
 import traceback
 import uvicorn
 from src.sqli_detector import SQLIDetector
-from src.analyzer import ResultAnalyzer 
 
 try:
     from database import SessionLocal, FormData # FormData é importado mas não usado diretamente nas rotas SQL raw
@@ -187,76 +185,6 @@ async def detect_sqli_endpoint(payload: QueryInput):
         print(f"API: Erro durante a predição: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Erro interno durante a predição: {str(e)}")
 
-
-# Se você ainda quiser o endpoint de análise de falsos negativos do último treinamento
-# (lembre-se que ele usará os dados cacheados DENTRO do arquivo .joblib)
-@app.get("/analyze-last-training-false-negatives", response_model=FalseNegativesResponse, tags=["Análise do Modelo"])
-async def analyze_last_training_fn_endpoint():
-    """
-    Analisa os falsos negativos do conjunto de teste usado durante o último treinamento
-    do modelo carregado (`models/sqli_detector_model.joblib`).
-    """
-    global sqli_detector_instance
-    
-    if not sqli_detector_instance or not sqli_detector_instance.is_trained():
-        raise HTTPException(status_code=503, 
-                            detail="Serviço de análise indisponível. Modelo não treinado ou não carregado.")
-
-    # get_last_evaluation_data() deve retornar os dados que foram salvos com o modelo
-    eval_data = sqli_detector_instance.get_last_evaluation_data()
-    if eval_data is None:
-        raise HTTPException(status_code=404, 
-                            detail="Nenhum dado de avaliação do último treinamento disponível no modelo carregado.")
-
-    df_cache, y_test_cache, y_pred_cache, test_indices_cache = eval_data
-    
-    analyzer = ResultAnalyzer() # Crie uma instância
-    try:
-        fn_df, analysis_details_dict = analyzer.analyze_false_negatives(
-            df_cache, y_test_cache, y_pred_cache, test_indices_cache
-        )
-        
-        output_file_path = 'results/api_loaded_model_false_negatives.csv' # Salvo pela API
-        fn_records = []
-        analysis_response_payload = None
-
-        if analysis_details_dict:
-            analysis_response_payload = FalseNegativeAnalysisDetails(
-                length_statistics=analysis_details_dict.get('length_statistics'),
-                common_patterns=analysis_details_dict.get('common_patterns')
-            )
-
-        if fn_df is not None and not fn_df.empty:
-            os.makedirs('results', exist_ok=True)
-            fn_df.to_csv(output_file_path, index=False)
-            
-            for _, row in fn_df.iterrows():
-                fn_records.append(FalseNegativeRecord(
-                    query=row.get('query', 'N/A'), 
-                    label=int(row.get('label', -1)) 
-                ))
-            
-            return FalseNegativesResponse(
-                message=f"Análise de falsos negativos do modelo carregado concluída. {len(fn_df)} registros salvos.",
-                count=len(fn_df),
-                false_negatives=fn_records,
-                analysis_details=analysis_response_payload,
-                file_path=output_file_path
-            )
-        else:
-            return FalseNegativesResponse(
-                message="Nenhum falso negativo encontrado nos dados de avaliação do modelo carregado.",
-                count=0,
-                false_negatives=[],
-                analysis_details=analysis_response_payload
-            )
-    except Exception as e:
-        print(f"API: Erro durante a análise de falsos negativos do modelo carregado: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Erro interno durante a análise: {str(e)}")
-
-
-# Adicione suas outras rotas (como /submit-form, /search) aqui, se necessário.
-# Elas não dependem do modelo de ML.
 
 if __name__ == "__main__":
     os.makedirs('results', exist_ok=True) # Para os CSVs de análise
