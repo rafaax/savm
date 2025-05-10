@@ -3,7 +3,9 @@ from sqlalchemy import text
 from database import FormData, SessionLocal
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI()
 
@@ -22,6 +24,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+
+
+@app.get("/")
+def root():
+    return FileResponse("index.html")
 
 @app.post("/submit-form")
 async def submit_form(
