@@ -7,7 +7,7 @@ from database import SessionLocal, TrainedModelLog
 from pathlib import Path 
 
 MODELS_DIR = 'models'
-DATASET_PATH = 'mocks/dataset.csv'
+DATASET_PATH = 'mocks/final_dataset.csv'
 RESULTS_DIR = 'results'
 
 def main():

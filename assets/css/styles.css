@@ -15,3 +15,13 @@ footer, header, hgroup, menu, nav, section {
 body {
     font-family: 'Inter', sans-serif;
 }
+
+#c {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* ensures it's behind other elements */
+    pointer-events: none; /* optional: allows clicks to pass through */
+  }

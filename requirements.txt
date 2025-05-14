@@ -9,6 +9,5 @@ openpyxl
 seaborn
 matplotlib
 setuptools
-xgboost
 pyyaml
 python-dotenv

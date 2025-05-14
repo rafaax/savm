@@ -53,6 +53,8 @@ class SQLIDetector:
 
             # Extrai features
             df_features_extracted = self.feature_extractor.extract_features(df_processed)
+            
+            df_features_extracted = df_features_extracted.dropna(subset=['label'])
 
             queries_for_tfidf = df_features_extracted['query'].astype(str) # Mantenha esta linha explícita
 

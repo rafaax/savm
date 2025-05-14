@@ -133,11 +133,11 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
                 pass
         raise HTTPException(status_code=503, detail=f"Erro no serviço de detecção: {str(e)}")
 
-    except Exception as e: # Captura qualquer outra exceção durante a predição ou o primeiro commit
+    except Exception as e:
         print(f"API ERRO: Exceção inesperada durante a predição ou log inicial: {e}\n{traceback.format_exc()}")
         
         try:
-            db.rollback() # Limpa a sessão antes de tentar logar o erro.
+            db.rollback()
         except Exception as log_err:
             print(f"API ERRO CRÍTICO: Falha ao logar exceção geral na detecção (após rollback): {log_err}")
             try:
