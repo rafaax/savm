@@ -216,18 +216,14 @@ class SQLIDetector:
         if not self._is_trained:
             raise RuntimeError("Modelo não treinado. Por favor, treine o modelo primeiro.")
 
-        # Preparar features
-        prepared_features_df = self._prepare_single_query_features(query_string)
         
-        # Fazer a predição
-        # O método predict do SVC espera um array 2D, mesmo para uma única amostra.
-        # O DataFrame já está no formato correto (1 linha, N colunas)
-        prediction = self.model.predict(prepared_features_df)
+        prepared_features_df = self._prepare_single_query_features(query_string) # Preparar features
+
+        prediction = self.model.predict(prepared_features_df) # Fazer a predição
         probability = self.model.predict_proba(prepared_features_df)
-        
         return {
             "query": query_string,
-            "is_malicious": bool(prediction[0]),
+            "is_malicious": bool(prediction[0] == '1'),
             "probability_benign": probability[0][0],
             "probability_malicious": probability[0][1],
             "label": int(prediction[0])

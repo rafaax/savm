@@ -8,7 +8,7 @@ from pathlib import Path
 import json
 
 MODELS_DIR = 'models'
-DATASET_PATH = 'mocks/dataset-inicial.csv'
+DATASET_PATH = 'mocks/dataset-curta+sqliv3.csv'
 RESULTS_DIR = 'results'
 
 def main():
@@ -67,9 +67,12 @@ def main():
     
     print("\nIniciando análise de falsos negativos...")
     evaluation_data = detector.get_last_evaluation_data() #  Análise detalhada usando os dados cacheados pelo detector
-    
+
     if evaluation_data:
         df_original_for_analysis, y_test_cached, y_pred_cached, test_indices_cached = evaluation_data
+
+        
+        
 
         analyzer = ResultAnalyzer()
 
@@ -82,14 +85,17 @@ def main():
             timestamp_str
         )
         
-        if fn_df is not None and not fn_df.empty:
-            fn_count = len(fn_df)
-            fn_analysis_filename = f"false_negatives_analysis_{timestamp_str}.csv"
-            fn_report_file_path  = os.path.join(RESULTS_DIR, fn_analysis_filename)
-            fn_df.to_csv(fn_report_file_path, index=False)
 
+        fn_count = analysis_details['false_negatives_count']  # Atualizando fn_count após a análise
+        
+        if not fn_df.empty:
+            fn_analysis_filename = f"false_negatives_analysis_{timestamp_str}.csv"
+            fn_report_file_path = os.path.join(RESULTS_DIR, fn_analysis_filename)
+            fn_df.to_csv(fn_report_file_path, index=False)
         else:
             print("\nNenhum falso negativo encontrado ou análise não pôde ser realizada.")
+            fn_report_file_path = None
+            
     else:
         print("\nNenhum dado de avaliação disponível no detector para análise de falsos negativos.")
 
