@@ -74,6 +74,16 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db=Depends(get_db)):
 
     try:
         prediction = sqli_detector_instance.predict_single(payload.query)
+
+        response_data = {
+            "query": prediction["query"],
+            "is_malicious": prediction["is_malicious"],
+            "probability_benign": prediction["probability_benign"],
+            "probability_malicious": prediction["probability_malicious"],
+            "label": prediction["label"],
+            "features_scaled": prediction.get("features_scaled", {}),
+            "features_unscaled": prediction.get("features_unscaled", {})
+        }
         
         new_log_entry = SQLiDetectionLog(
             query_text=prediction["query"],
@@ -85,7 +95,7 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db=Depends(get_db)):
         db.add(new_log_entry)
         db.commit()
 
-        return prediction
+        return response_data
 
     except RuntimeError as e:
         print(f"API ALERTA: RuntimeError durante a predição do modelo: {e}\n{traceback.format_exc()}")

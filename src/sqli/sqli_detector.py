@@ -174,40 +174,41 @@ class SQLIDetector:
 
 
 
-    def _prepare_single_query_features(self, query_string: str) -> pd.DataFrame:
-        """Prepara as features para uma única string de query para predição."""
-
+    def _prepare_single_query_features(self, query_string: str, return_unscaled: bool = False) -> pd.DataFrame:
+        """Prepara as features para uma única query, com opção de retornar versão não escalada."""
         if not self._is_trained:
             raise RuntimeError("O modelo deve ser treinado antes de fazer predições.")
 
-        # 1. Criar um DataFrame para a query única (necessário para SQLIFeatureExtractor)
-    
+        # DataFrame de entrada
         single_query_df_input = pd.DataFrame({'query': [query_string]})
 
-        # 2. Extrair features customizadas
-        
-        df_features_extracted_single = self.feature_extractor.extract_features(single_query_df_input.copy()) # Passar cópia
-
+        # Extrair features customizadas (não escaladas)
+        df_features_extracted_single = self.feature_extractor.extract_features(single_query_df_input.copy())
         custom_features_single_data_unscaled = df_features_extracted_single[self.custom_feature_names]
 
-        # 3. Transformar a query original com o TF-IDF Vectorizer treinado
-        
-        X_tfidf_matrix_single = self.vectorizer.transform([query_string]) # Passar como lista
-        
-        X_tfidf_df_single = pd.DataFrame(X_tfidf_matrix_single.toarray(), columns=self.tfidf_feature_names, index=custom_features_single_data_unscaled.index) # Manter o mesmo índice
+        # Features TF-IDF (não escaladas)
+        X_tfidf_matrix_single = self.vectorizer.transform([query_string])
+        X_tfidf_df_single = pd.DataFrame(
+            X_tfidf_matrix_single.toarray(), 
+            columns=self.tfidf_feature_names, 
+            index=custom_features_single_data_unscaled.index
+        )
 
-        # 4. Concatenar features TF-IDF e features customizadas (NÃO ESCALADAS)
-        
+        # Combinar features (não escaladas)
         X_combined_unscaled_single = pd.concat([X_tfidf_df_single, custom_features_single_data_unscaled], axis=1)
-        
         X_combined_unscaled_single = X_combined_unscaled_single[self.all_feature_names_ordered]
 
-        # 5. Escalar o conjunto combinado usando o scaler TREINADO
-
+        # Escalar features (para predição)
         scaled_X_combined_single_array = self.scaler.transform(X_combined_unscaled_single)
+        scaled_X_combined_single_df = pd.DataFrame(
+            scaled_X_combined_single_array, 
+            columns=self.all_feature_names_ordered, 
+            index=X_combined_unscaled_single.index
+        )
 
-        scaled_X_combined_single_df = pd.DataFrame(scaled_X_combined_single_array, columns=self.all_feature_names_ordered, index=X_combined_unscaled_single.index)
-        
+        # Retornar de acordo com o parâmetro
+        if return_unscaled:
+            return scaled_X_combined_single_df, X_combined_unscaled_single
         return scaled_X_combined_single_df
 
 
@@ -216,17 +217,21 @@ class SQLIDetector:
         if not self._is_trained:
             raise RuntimeError("Modelo não treinado. Por favor, treine o modelo primeiro.")
 
-        
-        prepared_features_df = self._prepare_single_query_features(query_string) # Preparar features
+        # Obter features escaladas E não escaladas em uma única chamada
+        scaled_features_df, unscaled_features_df = self._prepare_single_query_features(query_string, return_unscaled=True)
 
-        prediction = self.model.predict(prepared_features_df) # Fazer a predição
-        probability = self.model.predict_proba(prepared_features_df)
+        # Fazer predição
+        prediction = self.model.predict(scaled_features_df)
+        probability = self.model.predict_proba(scaled_features_df)
+
         return {
             "query": query_string,
             "is_malicious": bool(prediction[0] == '1'),
             "probability_benign": probability[0][0],
             "probability_malicious": probability[0][1],
-            "label": int(prediction[0])
+            "label": int(prediction[0]),
+            "features_scaled": scaled_features_df.iloc[0].to_dict(),    # Usadas pelo modelo
+            "features_unscaled": unscaled_features_df.iloc[0].to_dict() # Valores brutos
         }
     
 
