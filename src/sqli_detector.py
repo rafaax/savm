@@ -138,7 +138,7 @@ class SQLIDetector:
             print(f"[INFO] Acurácia: {accuracy:.4f}, Precisão: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
             print(f"[INFO] Matriz de Confusão: {conf_matrix_list}")
 
-            # subset_size = 0.1  # Ajuste conforme necessário
+            # subset_size = 0.1 
             # X_subset = X_combined.sample(frac=subset_size, random_state=42)
             # y_subset = y.loc[X_subset.index]
 

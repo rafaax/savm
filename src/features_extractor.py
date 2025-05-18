@@ -3,49 +3,47 @@ import re
 class SQLIFeatureExtractor:
     def __init__(self):
         self.patterns = {
-            'union': re.compile(r'\bunion\b', re.IGNORECASE),
-            'select_all': re.compile(r'select\s+\*', re.IGNORECASE),
-            'drop': re.compile(r'\bdrop\b', re.IGNORECASE),
-            'exec': re.compile(r'\bexec(?:ute)?\b', re.IGNORECASE),
-            'function_exploit': re.compile(r'xp_cmdshell|sp_execute|utl_http', re.IGNORECASE),
-            'single_quote': re.compile(r"'"),
-            'parentheses': re.compile(r"[()]"),
-            'semicolon': re.compile(r";"),
-            'concat': re.compile(r"\|\||\+"),
-            'hex': re.compile(r"0x[0-9a-f]+", re.IGNORECASE),
-            'encoding': re.compile(r"%[0-9a-f]{2}", re.IGNORECASE),
-            'system_tables': re.compile(r'information_schema\.|sys(?:columns|\.)|pg_catalog', re.IGNORECASE),
-            'union_fragments': re.compile(r'union\s+(?:all\s+)?select|select\s+\*\s+from', re.IGNORECASE),
-            'oracle_exploits': re.compile(r'\|\|utl_http\.request|dbms_\w+|utl_inaddr', re.IGNORECASE),
-            'char_encoding': re.compile(r'char\s*$$\s*[\d\s,]+\s*$$', re.IGNORECASE),
-            'time_delay': re.compile(r'\b(?:sleep|waitfor|pg_sleep)\s*$$\s*\d+\s*$$', re.IGNORECASE),
-            'load_file': re.compile(r'\bload_file\s*$$|into\s+(?:out|dump)file', re.IGNORECASE),
-            'sleep': re.compile(r'\bsleep\(\d+\)', re.IGNORECASE),
-            'waitfor': re.compile(r'\bwaitfor delay\b', re.IGNORECASE),
-            'benchmark': re.compile(r'benchmark\(\d+,', re.IGNORECASE),
-            'information_schema': re.compile(r'information_schema', re.IGNORECASE),
-            'stacked_queries': re.compile(r';\s*select\b', re.IGNORECASE),
-            'delete': re.compile(r'\bdelete\b', re.IGNORECASE),
-            'truncate': re.compile(r'\btruncate\b', re.IGNORECASE),
-            'alter': re.compile(r'\balter\b', re.IGNORECASE),
-            'update': re.compile(r'\bupdate\b', re.IGNORECASE),
-            'insert': re.compile(r'\binsert\b', re.IGNORECASE),
+            'union': re.compile(r'\bunion\b', re.IGNORECASE), # Detecta a presença de "UNION", que pode ser usado para combinar resultados de mais de uma consulta SELECT em um único conjunto de resultados
+            'select_all': re.compile(r'select\s+\*', re.IGNORECASE), # Identifica o uso de "SELECT *", que seleciona todos os campos de uma tabela
+            'drop': re.compile(r'\bdrop\b', re.IGNORECASE), # Verifica a presença do comando "DROP", usado para deletar um banco de dados ou tabela
+            'exec': re.compile(r'\bexec(?:ute)?\b', re.IGNORECASE), # Procura por "EXEC" ou "EXECUTE", usado para executar um bloco de código SQL
+            'function_exploit': re.compile(r'xp_cmdshell|sp_execute|utl_http', re.IGNORECASE), #  Detecta funções potencialmente perigosas como "xp_cmdshell", "sp_execute", que permitem a execução de comandos no sistema operacional
+            'single_quote': re.compile(r"'"), # Verifica a presença de aspas simples ('), frequentemente usadas para delimitar strings em SQL
+            'parentheses': re.compile(r"[()]"), # Identifica parênteses, usados para agrupar expressões ou listas de parâmetros
+            'semicolon': re.compile(r";"), #  Detecta ponto e vírgula (;), utilizado para terminar instruções SQL, permitindo assim consultas empilhadas
+            'concat': re.compile(r"\|\||\+"), # Procura operadores de concatenação, como "||" ou "+", que unem strings
+            'hex': re.compile(r"0x[0-9a-f]+", re.IGNORECASE), # Identifica literais hexadecimais, que podem ser usados para representar dados binários
+            'encoding': re.compile(r"%[0-9a-f]{2}", re.IGNORECASE), # Detecta caracteres codificados em URL (como %20), que podem esconder intenções maliciosas
+            'system_tables': re.compile(r'information_schema\.|sys(?:columns|\.)|pg_catalog', re.IGNORECASE), #  Procura referências a tabelas de sistema, como "information_schema", que fornecem metadados do banco de dados
+            'union_fragments': re.compile(r'union\s+(?:all\s+)?select|select\s+\*\s+from', re.IGNORECASE), # Detecta fragmentos complexos de consultas UNION
+            'oracle_exploits': re.compile(r'\|\|utl_http\.request|dbms_\w+|utl_inaddr', re.IGNORECASE), # Procura por funções específicas a Oracle utilizadas em ataques, como "utl_http"
+            'char_encoding': re.compile(r'char\s*$$\s*[\d\s,]+\s*$$', re.IGNORECASE), #  Detecta usos maliciosos da função CHAR, que pode esconder strings
+            'time_delay': re.compile(r'\b(?:sleep|waitfor|pg_sleep)\s*$$\s*\d+\s*$$', re.IGNORECASE), # Identifica tentativas de atrasar a execução com funções como "SLEEP", usadas em ataques baseados em tempo.
+            'load_file': re.compile(r'\bload_file\s*$$|into\s+(?:out|dump)file', re.IGNORECASE), # Detecta tentativas de carregar ou manipular arquivos
+            'sleep': re.compile(r'\bsleep\(\d+\)', re.IGNORECASE), # Procura por chamadas da função "SLEEP", específicas para ataques de injeção baseada em tempo
+            'waitfor': re.compile(r'\bwaitfor delay\b', re.IGNORECASE), # Identifica o uso de "WAITFOR DELAY", outro método de introduzir atrasos
+            'benchmark': re.compile(r'benchmark\(\d+,', re.IGNORECASE), #  Detecta uso de "BENCHMARK", que mede o tempo de execução de funções SQL
+            'information_schema': re.compile(r'information_schema', re.IGNORECASE), # Verifica referências específicas a "information_schema", que pode dar informações sobre o banco
+            'stacked_queries': re.compile(r';\s*select\b', re.IGNORECASE), # Detecta consultas empilhadas que permitem executar múltiplas instruções SQL em uma única execução
+            'delete': re.compile(r'\bdelete\b', re.IGNORECASE), # Procura por o comando "DELETE", usado para excluir registros de uma tabela
+            'truncate': re.compile(r'\btruncate\b', re.IGNORECASE), # Identifica o uso de "TRUNCATE", que remove todos os dados de uma tabela
+            'alter': re.compile(r'\balter\b', re.IGNORECASE), #  Detecta "ALTER", usado para modificar a estrutura de tabelas
+            'update': re.compile(r'\bupdate\b', re.IGNORECASE), # Verifica a presença de "UPDATE", empregado para modificar registros existentes
+            'insert': re.compile(r'\binsert\b', re.IGNORECASE), #  Procura o comando "INSERT", usado para adicionar registros a uma tabela
         }
 
     def extract_features(self, df):
-        if 'query' in df.columns:
+
+        def safe_contains(column, pattern):
+            result = df['query'].str.contains(pattern, regex=True).fillna(False)
+            result = result.infer_objects(copy=False)
+            return result.astype(int)
         
-            # Pré-processamento básico
-            df['query'] = df['query'].str.lower()
-            df['query_length'] = df['query'].str.len()
+        if 'query' in df.columns:
 
-            # Função para verificar e converter
-            def safe_contains(column, pattern):
-                result = df['query'].str.contains(pattern, regex=True).fillna(False)
-                result = result.infer_objects(copy=False)
-                return result.astype(int)
+            df['query'] = df['query'].str.lower() # jogando tudo para lowercase
+            df['query_length'] = df['query'].str.len() # pegando o tamanho da 'query'
 
-            # Features básicas
             df['has_or'] = safe_contains(df['query'], r'\bor\b')
             df['has_and'] = safe_contains(df['query'], r'\band\b')
             df['has_not'] = safe_contains(df['query'], r'\bnot\b')
