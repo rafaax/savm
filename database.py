@@ -72,14 +72,14 @@ class TrainedModelLog(Base):
     f1_score = Column(Float, nullable=True)   
     false_negatives_count = Column(Integer, nullable=True)
     false_negatives_report_path = Column(String, nullable=True)
-
+    training_duration_seconds = Column(Float, nullable=True)
     notes = Column(Text, nullable=True)
 
     def __repr__(self):
         return (f"<TrainedModelLog(id={self.id}, filename='{self.model_filename}', "
                 f"accuracy={self.accuracy:.4f if self.accuracy is not None else 'N/A'}, "
-                f"f1_score={self.f1_score:.4f if self.f1_score is not None else 'N/A'})>")
-
+                f"f1_score={self.f1_score:.4f if self.f1_score is not None else 'N/A'}, "
+                f"training_duration_seconds={self.training_duration_seconds:.2f if self.training_duration_seconds is not None else 'N/A'})>")
 
 Base.metadata.create_all(bind=engine)
 

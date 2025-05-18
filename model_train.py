@@ -7,7 +7,7 @@ from database import SessionLocal, TrainedModelLog
 from pathlib import Path 
 
 MODELS_DIR = 'models'
-DATASET_PATH = 'mocks/final_dataset.csv'
+DATASET_PATH = 'mocks/dataset-concatenada_v2.csv'
 RESULTS_DIR = 'results'
 
 def main():
@@ -38,12 +38,14 @@ def main():
     current_precision = training_metrics.get('precision')
     current_recall = training_metrics.get('recall')
     current_f1_score = training_metrics.get('f1_score')
+    training_duration = training_metrics.get('training_duration_seconds')
 
     print("\nMétricas de Treinamento:")
     print(f"  Acurácia: {current_accuracy:.4f}" if current_accuracy is not None else "  Acurácia: N/A")
     print(f"  Precisão: {current_precision:.4f}" if current_precision is not None else "  Precisão: N/A")
     print(f"  Recall:   {current_recall:.4f}" if current_recall is not None else "  Recall: N/A")
     print(f"  F1-Score: {current_f1_score:.4f}" if current_f1_score is not None else "  F1-Score: N/A")
+    print(f"  Duração do Treinamento: {training_duration:.2f} segundos" if training_duration is not None else "  Duração do Treinamento: N/A")
 
     timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     model_filename = f"sqli_detector_model_{timestamp_str}.joblib"
@@ -103,7 +105,8 @@ def main():
             accuracy=current_accuracy,
             precision=current_precision,
             recall=current_recall,
-            f1_score=current_f1_score,            
+            f1_score=current_f1_score,
+            training_duration_seconds=training_duration,
             false_negatives_count=fn_count,
             false_negatives_report_path=str(Path(fn_report_file_path).resolve()) if fn_report_file_path else None,
             notes=f"Modelo treinado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}."

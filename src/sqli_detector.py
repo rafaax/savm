@@ -3,6 +3,7 @@ import joblib
 import os
 import traceback
 import numpy as np
+import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
@@ -30,7 +31,7 @@ class SQLIDetector:
             'has_time_delay_fn', 'has_load_file_fn', 'has_delete', 'has_truncate', 'has_alter', 'has_update', 
             'has_insert' 
         ]
-        
+
         self.all_feature_names_ordered = []
 
         self.test_indices = None
@@ -43,105 +44,93 @@ class SQLIDetector:
 
     def train(self, df_input: pd.DataFrame):
         """Treina o modelo completo e armazena informações necessárias para predição e análise."""
-        
+
+        start_time = time.time()
+        print("[INFO] Iniciando processo de treinamento...")
+
         try:
             if 'query' not in df_input.columns or 'label' not in df_input.columns:
                 raise ValueError("DataFrame de entrada deve conter colunas 'query' e 'label'")
 
-            # Faz uma cópia para não modificar o DataFrame original passado para a função
+            print(f"[INFO] Total de amostras recebidas: {len(df_input)}")
+
             df_processed = df_input.copy()
+            self.df_cache = df_input.copy()
 
-            self.df_cache = df_input.copy() # Armazena uma cópia do DF original não processado
-
-            # Extrai features
+            print("[INFO] Extraindo features customizadas...")
             df_features_extracted = self.feature_extractor.extract_features(df_processed)
-            
             df_features_extracted = df_features_extracted.dropna(subset=['label'])
 
-            queries_for_tfidf = df_features_extracted['query'].astype(str) # Mantenha esta linha explícita
+            print(f"[INFO] Total de amostras após remoção de 'label' nulo: {len(df_features_extracted)}")
 
-            # Verifica se todas as features customizadas esperadas foram geradas
             missing_custom_features = [f for f in self.custom_feature_names if f not in df_features_extracted.columns]
-
             if missing_custom_features:
                 raise ValueError(f"SQLIFeatureExtractor não gerou as seguintes features esperadas: {missing_custom_features}. Features geradas: {df_features_extracted.columns.tolist()}")
 
-            custom_features_data = df_features_extracted[self.custom_feature_names]
-            
-            # Fit e transform TF-IDF na 'query' original
-            X_tfidf_matrix = self.vectorizer.fit_transform(df_features_extracted['query'].astype(str))
+            print("[INFO] Gerando matriz TF-IDF...")
+            queries_for_tfidf = df_features_extracted['query'].astype(str)
+            X_tfidf_matrix = self.vectorizer.fit_transform(queries_for_tfidf)
 
-            print("TAMANHO DO VOCABULÁRIO TF-IDF:", len(self.vectorizer.vocabulary_))
-            # Se o tamanho for > 0, imprima alguns itens para ver o que ele capturou
-            if len(self.vectorizer.vocabulary_) > 0:
-                print("ALGUNS ITENS DO VOCABULÁRIO TF-IDF (primeiros 10):")
-                count = 0
-                for term, index in self.vectorizer.vocabulary_.items():
-                    print(f"Termo: '{term}', Índice: {index}")
-                    count += 1
-                    if count >= 10:
-                        break
-            else:
-                print("VOCABULÁRIO TF-IDF ESTÁ VAZIO.")
-
-            
-
+            print(f"[INFO] TF-IDF gerado com {X_tfidf_matrix.shape[1]} features.")
 
             self.tfidf_feature_names = self.vectorizer.get_feature_names_out().tolist()
+            print(f"[INFO] Primeiras 10 features TF-IDF: {self.tfidf_feature_names[:10]}")
 
-            print("Algumas features TF-IDF:", self.tfidf_feature_names[:20]) # Veja as primeiras
-            print("Total de features TF-IDF:", len(self.tfidf_feature_names))
-
-            print("TF-IDF FEATURE NAMES (get_feature_names_out):", self.tfidf_feature_names) # Repetir o print
-
-            X_tfidf_matrix = self.vectorizer.fit_transform(df_features_extracted['query'].astype(str))
-            self.tfidf_feature_names = self.vectorizer.get_feature_names_out().tolist()
             X_tfidf_df = pd.DataFrame(X_tfidf_matrix.toarray(), columns=self.tfidf_feature_names, index=df_features_extracted.index)
-
-            # Use as features customizadas NÃO escaladas para a concatenação
             custom_features_data_unscaled = df_features_extracted[self.custom_feature_names]
 
+            print("[INFO] Concatenando features TF-IDF com features customizadas...")
             X_combined_unscaled = pd.concat([X_tfidf_df, custom_features_data_unscaled], axis=1)
             self.all_feature_names_ordered = X_combined_unscaled.columns.tolist()
+
+            print(f"[INFO] Total de features combinadas (TF-IDF + custom): {len(self.all_feature_names_ordered)}")
 
             scaled_X_combined_array = self.scaler.fit_transform(X_combined_unscaled)
             X_combined = pd.DataFrame(scaled_X_combined_array, columns=self.all_feature_names_ordered, index=X_combined_unscaled.index)
 
             y = df_features_extracted['label']
-            
+            print(f"[INFO] Distribuição das classes:\n{y.value_counts().to_dict()}")
+
+            print("[INFO] Dividindo dados em treino e teste...")
             X_train, X_test, y_train, y_test = train_test_split(
                 X_combined, y, test_size=0.3, random_state=42, stratify=y
             )
-            
+            print(f"[INFO] Tamanho do treino: {len(X_train)}, teste: {len(X_test)}")
+
             self.test_indices = X_test.index.tolist()
-            
+
+            print("[INFO] Treinando o modelo SVM...")
             self.model.fit(X_train, y_train)
+
+            print("[INFO] Avaliando modelo...")
             y_pred_test = self.model.predict(X_test)
-            
+
             self._is_trained = True
+            df_original_test_set = self.df_cache.loc[self.test_indices].copy()
+            self._last_evaluation_data = (df_original_test_set, y_test.values, y_pred_test, self.test_indices)
 
-            # Preparar dados para get_last_evaluation_data
-            df_original_test_set = self.df_cache.loc[self.test_indices].copy() # Usa self.df_cache e self.test_indices
-            self._last_evaluation_data = (df_original_test_set, y_test.values, y_pred_test, self.test_indices) # y_test.values para array numpy
-
-            # Calcular métricas
             accuracy = accuracy_score(y_test, y_pred_test)
             precision = precision_score(y_test, y_pred_test, zero_division=0)
             recall = recall_score(y_test, y_pred_test, zero_division=0)
             f1 = f1_score(y_test, y_pred_test, zero_division=0)
             report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0)
             conf_matrix_list = confusion_matrix(y_test, y_pred_test).tolist()
-            
-            # retorna todas métricas necessarias para a aplicação
+
+            duration = time.time() - start_time
+            print(f"[INFO] Treinamento finalizado em {duration:.2f} segundos.")
+            print(f"[INFO] Acurácia: {accuracy:.4f}, Precisão: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
+            print(f"[INFO] Matriz de Confusão: {conf_matrix_list}")
+
             return {
                 "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1,
                 "classification_report_dict": report_dict,
-                "confusion_matrix_list": conf_matrix_list
+                "confusion_matrix_list": conf_matrix_list,
+                "training_duration_seconds": duration
             }
-            
+        
         except Exception as e:
 
             self._is_trained = False
@@ -149,7 +138,8 @@ class SQLIDetector:
             traceback.print_exc()
             return {
                 "accuracy": None, "precision": None, "recall": None, "f1_score": None,
-                "classification_report_dict": None, "confusion_matrix_list": None, "error": str(e)
+                "classification_report_dict": None, "confusion_matrix_list": None, "error": str(e),
+                "training_duration_seconds": None
             }
 
 
