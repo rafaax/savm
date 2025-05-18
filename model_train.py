@@ -11,8 +11,11 @@ MODELS_DIR = 'models'
 DATASET_PATH = 'mocks/dataset-curta+sqliv3.csv'
 RESULTS_DIR = 'results'
 
+
 def main():
 
+    timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    
     os.makedirs(MODELS_DIR, exist_ok=True)
     os.makedirs(RESULTS_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(DATASET_PATH), exist_ok=True)

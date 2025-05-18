@@ -1,4 +1,5 @@
 import re
+import warnings
 
 class SQLIFeatureExtractor:
     def __init__(self):
@@ -39,8 +40,9 @@ class SQLIFeatureExtractor:
     def extract_features(self, df):
 
         def safe_contains(column, pattern):
-            result = df['query'].str.contains(pattern, regex=True).fillna(False)
-            result = result.infer_objects(copy=False)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", UserWarning)
+                result = df['query'].str.contains(pattern, regex=True).fillna(False)
             return result.astype(int)
         
         if 'query' in df.columns:

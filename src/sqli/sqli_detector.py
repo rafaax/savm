@@ -27,7 +27,7 @@ class SQLIDetector:
         self.scaler = MinMaxScaler()
 
         self.model_params = {
-            'kernel': 'rbf',
+            'kernel': 'linear',
             'C': 1.5,
             'gamma': 'scale',
             'class_weight': 'balanced',

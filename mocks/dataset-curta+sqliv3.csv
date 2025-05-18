@@ -19920,8 +19920,8 @@ SELECT * FROM Users WHERE UserId  =  105 OR 1 = 1,
 "SELECT UserId, Name, PasswordFROM Users WHERE UserId  =  105 or 1 = 1;",0
 "SELECT * FROM Users WHERE Name  = ""John Doe"" AND Pass  = ""myPass""",0
 "SELECT * FROM Users WHERE Name  = """" or """" = """" AND Pass  = """" or """" = """"",0
-SELECT * FROM Users, DROP TABLE Suppliers
-SELECT * FROM Users WHERE UserId  =  105, DROP TABLE Suppliers
+SELECT * FROM Users, 0
+SELECT * FROM Users WHERE UserId  =  105, 0
 SELECT ProductName FROM Products,0
 WHERE ProductID  =  ALL  ( SELECT ProductID FROM OrderDetails WHERE Quantity  =  10 ) ,
 WHERE ProductID  =  ANY  ( SELECT   ProductID FROM OrderDetails WHERE Quantity  =  10 ) ,
@@ -19932,8 +19932,8 @@ SELECT * FROM Customers ORDER BY CustomerName ASC,
 "SELECT customername, contactname FROM customers; CREATE INDEX idx_lastname ON Persons  ( LastName ) ; CREATE INDEX idx_pname ON Persons  ( LastName, FirstName ) ; CREATE UNIQUE INDEX uidx_pid ON Persons  ( PersonID ) ; CREATE VIEW [Brazil Customers] AS ",0
 "SELECT CustomerName, ContactName FROM Customers WHERE Country  =  ""Brazil""; CREATE OR REPLACE VIEW [Brazil Customers] AS ",0
 "SELECT CustomerName, ContactName, City FROM Customers WHERE Country  =  ""Brazil"";",0
-SELECT * FROM [Brazil Customers], CREATE PROCEDURE SelectAllCustomers AS
-SELECT * FROM Customers GO,  EXEC SelectAllCustomers
+SELECT * FROM [Brazil Customers], 0
+SELECT * FROM Customers GO,  0
 SELECT * FROM [Brazil   Customers],
 "SELECT CustomerName, ContactName FROM Customers WHERE  Country  =  ""Brazil"";",0
 SELECT * FROM Customers ORDER BY CustomerName DESC,
@@ -19944,7 +19944,7 @@ SELECT * FROM Customers  WHERE CustomerName LIKE 'a_%_%',
 SELECT * FROM Customers WHERE ROWNUM < =  3,
 SELECT * FROM Customers ORDER BY CustomerName,
 "SELECT customername, contactname FROM customers; ALTER TABLE Customers ADD Email varchar ( 255 ) ; ALTER TABLE Customers DROP COLUMN Email; DROP TABLE Shippers;  TRUNCATE TABLE Categories;",0
-SELECT * FROM [Brazil Customers], CREATE OR REPLACE VIEW [Brazil Customers] AS
+SELECT * FROM [Brazil Customers], 0
 "SELECT CustomerName, ContactName, City FROM Customers WHERE Country  =  ""Brazil""; DROP VIEW [Brazil Customers];",0
 SELECT ASCII ( CustomerName )  AS NumCodeOfFirstChar FROM Customers,
 "SELECT CHAR_LENGTH ( ""SQL Tutorial"" )  AS LengthOfString;",0
