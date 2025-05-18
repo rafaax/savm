@@ -34,7 +34,8 @@ class SQLIFeatureExtractor:
             'null_byte': re.compile(r'%00|\x00', re.IGNORECASE),
             'second_order': re.compile(r'\b(?:select|insert)\b.*\b(?:select|insert)\b', re.IGNORECASE),
             'mysql_commands': re.compile(r'\b(?:load_file|into\s+outfile|into\s+dumpfile)\b', re.IGNORECASE), # Comandos específicos de bancos
-            'mssql_commands': re.compile(r'\b(?:openrowset|opendatasource)\b', re.IGNORECASE) # Comandos específicos de bancos
+            'mssql_commands': re.compile(r'\b(?:openrowset|opendatasource)\b', re.IGNORECASE), # Comandos específicos de bancos
+            'tautology': re.compile(r'\b(1\s*=\s*1|true\b|false\s*!=\s*true|1\s*>\s*-1)\b', re.IGNORECASE)
         } 
 
     def extract_features(self, df):
@@ -107,8 +108,15 @@ class SQLIFeatureExtractor:
                 df['has_drop'] | df['has_truncate'] | 
                 df['has_unconditional_delete']
             ).astype(int)
+            
+            df['has_tautology'] = safe_contains(df['query'], self.patterns['tautology'])
+
+            df['has_null_byte'] = safe_contains(df['query'], self.patterns['null_byte'])
+            df['has_mysql_commands'] = safe_contains(df['query'], self.patterns['mysql_commands'])
+            df['has_mssql_commands'] = safe_contains(df['query'], self.patterns['mssql_commands'])
 
         else:
             print("A coluna 'query' não existe no dataframe.")
 
         return df
+        

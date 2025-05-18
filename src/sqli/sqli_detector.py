@@ -40,29 +40,19 @@ class SQLIDetector:
         self.tfidf_feature_names = []
 
         self.custom_feature_names = [
-            # Features básicas
-            'query_length', 'space_count', 'special_char_count',
-            # Operadores lógicos
+            'query_length', 'space_count', 'quote_count', 'special_char_count', 'operator_count',
             'has_or', 'has_and', 'has_not',
-            # Comandos DML/DDL
-            'has_drop', 'has_delete', 'has_truncate', 'has_alter',
-            'has_unconditional_delete', 'has_destructive_command',
-            # Técnicas de injeção
+            'has_drop', 'has_exec', 'has_delete', 'has_truncate', 'has_alter',
+            'has_update', 'has_insert', 'has_unconditional_delete', 'has_destructive_command',
             'has_union', 'has_comment', 'has_semicolon', 
             'has_always_true', 'has_or_injection',
-            # Time-based attacks
-            'has_time_delay',
-            # System exploration
-            'has_system_tables',
-            # Outras técnicas
-            'has_hex_injection', 'has_second_order',
-            # Contagens
-            'quote_count', 'operator_count',
-            # outras
-            'has_select_all', 'has_exec', 'has_function_exploit',
-            'has_single_quote', 'has_parentheses', 'has_concat_symbols',
-            'has_encoding', 'has_union_fragments', 'has_oracle_exploits',
-            'has_char_encoding', 'has_load_file_fn', 'has_update', 'has_insert'
+            'has_time_delay', 'has_system_tables',
+            'has_hex_injection', 'has_second_order', 'has_tautology',
+            'has_select_all', 'has_function_exploit', 'has_single_quote', 'has_parentheses',
+            'has_concat_symbols', 'has_encoding', 'has_union_fragments', 'has_oracle_exploits',
+            'has_char_encoding', 'has_load_file_fn',
+            'has_stacked_queries', 'has_sleep', 'has_waitfor', 'has_benchmark',
+            'has_information_schema', 'has_null_byte', 'has_mysql_commands', 'has_mssql_commands'
         ]
         self.all_feature_names_ordered = []
 
@@ -271,6 +261,7 @@ class SQLIDetector:
         probability = self.model.predict_proba(scaled_features_df)
 
         unscaled_features = unscaled_features_df.iloc[0].to_dict()
+
         active_features = {
             feature: value 
             for feature, value in unscaled_features.items()
