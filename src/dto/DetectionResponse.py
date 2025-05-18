@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Union
 
 class DetectionResponseDTO(BaseModel):
     query: str
@@ -7,5 +7,4 @@ class DetectionResponseDTO(BaseModel):
     probability_benign: float
     probability_malicious: float
     label: int
-    features_scaled: Dict[str, Any] 
-    features_unscaled: Dict[str, Any]
+    active_features: Dict[str, Union[int, float, bool]]

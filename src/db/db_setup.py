@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float,  create_engine
+from sqlalchemy import JSON, Column, Integer, String, DateTime, Boolean, Text, Float,  create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
@@ -51,6 +51,7 @@ class SQLiDetectionLog(Base):
     prediction_label = Column(Integer)
     probability_benign = Column(Float)
     probability_malicious = Column(Float)
+    active_features = Column(JSON)
 
     def __repr__(self):
         return (f"<SQLiDetectionLog(id={self.id}, query='{self.query_text[:30]}...', "

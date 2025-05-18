@@ -224,14 +224,22 @@ class SQLIDetector:
         prediction = self.model.predict(scaled_features_df)
         probability = self.model.predict_proba(scaled_features_df)
 
+        unscaled_features = unscaled_features_df.iloc[0].to_dict()
+        active_features = {
+            feature: value 
+            for feature, value in unscaled_features.items()
+            if feature in self.custom_feature_names and  # Apenas features custom
+            ((isinstance(value, (int, float)) and value != 0) or 
+                (isinstance(value, bool) and value))
+        }
+
         return {
             "query": query_string,
             "is_malicious": bool(prediction[0] == '1'),
             "probability_benign": probability[0][0],
             "probability_malicious": probability[0][1],
             "label": int(prediction[0]),
-            "features_scaled": scaled_features_df.iloc[0].to_dict(),    # Usadas pelo modelo
-            "features_unscaled": unscaled_features_df.iloc[0].to_dict() # Valores brutos
+            "active_features": active_features  # Somente features ativadas
         }
     
 
