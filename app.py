@@ -146,6 +146,27 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db = Depends(get_db)):
                 pass
         raise HTTPException(status_code=500, detail="Erro interno do servidor durante o processamento da sua requisição.")
 
+@app.get("/trained-model-logs", tags=["Trained Model Logs"])
+async def get_trained_model_logs(db=Depends(get_db)):
+    try:
+        result = db.execute(text("SELECT * FROM trained_model_logs"))
+        return [dict(row._mapping) for row in result]
+    
+    except Exception as e:
+        print(f"API ERRO ao buscar logs de modelo: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar logs de modelo.")
+    
+
+
+@app.get("/all-queries-detected", tags=["All Queries"])
+async def get_all_queries(db=Depends(get_db)):
+    try:
+        result = db.execute(text("SELECT * FROM sqli_detection_logs"))
+        return [dict(row._mapping) for row in result]
+    
+    except Exception as e:
+        print(f"API ERRO ao buscar as queries: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar as queries executadas no sistema.")
 
 if __name__ == "__main__":
     os.makedirs('results', exist_ok=True)
