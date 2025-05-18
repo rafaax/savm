@@ -8,7 +8,7 @@ from pathlib import Path
 import json
 
 MODELS_DIR = 'models'
-DATASET_PATH = 'mocks/dataset-concatenada_v2.csv'
+DATASET_PATH = 'mocks/dataset-inicial.csv'
 RESULTS_DIR = 'results'
 
 def main():

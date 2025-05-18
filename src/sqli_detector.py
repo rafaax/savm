@@ -99,8 +99,16 @@ class SQLIDetector:
             scaled_X_combined_array = self.scaler.fit_transform(X_combined_unscaled)
             X_combined = pd.DataFrame(scaled_X_combined_array, columns=self.all_feature_names_ordered, index=X_combined_unscaled.index)
 
+            X_combined = X_combined.fillna(0)
+
             y = df_features_extracted['label']
             print(f"[INFO] Distribuição das classes:\n{y.value_counts().to_dict()}")
+
+            class_counts = y.value_counts()
+            classes_to_keep = class_counts[class_counts > 1].index
+            df_features_extracted = df_features_extracted[df_features_extracted['label'].isin(classes_to_keep)]
+            y = df_features_extracted['label']
+            X_combined = X_combined.loc[df_features_extracted.index]
 
             print("[INFO] Dividindo dados em treino e teste...")
             X_train, X_test, y_train, y_test = train_test_split(X_combined, y, test_size=0.3, random_state=42, stratify=y)
@@ -119,9 +127,9 @@ class SQLIDetector:
             self._last_evaluation_data = (df_original_test_set, y_test.values, y_pred_test, self.test_indices)
 
             accuracy = accuracy_score(y_test, y_pred_test)
-            precision = precision_score(y_test, y_pred_test, zero_division=0)
-            recall = recall_score(y_test, y_pred_test, zero_division=0)
-            f1 = f1_score(y_test, y_pred_test, zero_division=0)
+            precision = precision_score(y_test, y_pred_test, average='macro', zero_division=0)
+            recall = recall_score(y_test, y_pred_test, average='macro', zero_division=0)
+            f1 = f1_score(y_test, y_pred_test, average='macro', zero_division=0)
             report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0)
             conf_matrix_list = confusion_matrix(y_test, y_pred_test).tolist()
             duration = time.time() - start_time
@@ -130,15 +138,16 @@ class SQLIDetector:
             print(f"[INFO] Acurácia: {accuracy:.4f}, Precisão: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
             print(f"[INFO] Matriz de Confusão: {conf_matrix_list}")
 
-            # result = permutation_importance(self.model, X_combined, y, n_repeats=30, random_state=42)
+            # subset_size = 0.1  # Ajuste conforme necessário
+            # X_subset = X_combined.sample(frac=subset_size, random_state=42)
+            # y_subset = y.loc[X_subset.index]
+
+            # # Importância por permutação no subconjunto
+            # result = permutation_importance(self.model, X_subset, y_subset, n_repeats=10, random_state=42, n_jobs=-1)
 
             # print("\nImportância das Features por Permutação:")
             # for i in result.importances_mean.argsort()[::-1]:
             #     print(f"{self.all_feature_names_ordered[i]}: {result.importances_mean[i]:.3f}")
-
-            # explainer = shap.KernelExplainer(self.model.predict, X_combined)
-            # shap_values = explainer.shap_values(X_combined)
-            # shap.summary_plot(shap_values, X_combined, feature_names=self.all_feature_names_ordered)
 
 
             return {

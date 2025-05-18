@@ -33,56 +33,65 @@ class SQLIFeatureExtractor:
         }
 
     def extract_features(self, df):
-        # Pré-processamento básico
-        df['query'] = df['query'].str.lower()
-        df['query_length'] = df['query'].str.len()
+        if 'query' in df.columns:
         
-        # Features básicas
-        df['has_or'] = df['query'].str.contains(r'\bor\b', regex=True).astype(int)
-        df['has_and'] = df['query'].str.contains(r'\band\b', regex=True).astype(int)
-        df['has_not'] = df['query'].str.contains(r'\bnot\b', regex=True).astype(int)
-        df['has_union'] = df['query'].str.contains(self.patterns['union']).astype(int)
-        df['has_select_all'] = df['query'].str.contains(self.patterns['select_all']).astype(int)
-        df['has_comment'] = df['query'].str.contains(r'--|#|\/\*', regex=True).astype(int)
-        df['has_equals'] = df['query'].str.contains('=', regex=False).astype(int)
-        
-        # Comandos perigosos
-        df['has_drop'] = df['query'].str.contains(self.patterns['drop']).astype(int)
-        df['has_exec'] = df['query'].str.contains(self.patterns['exec']).astype(int)
-        df['has_function_exploit'] = df['query'].str.contains(self.patterns['function_exploit']).astype(int)
-        
-        # Padrões estruturais
-        df['has_single_quote'] = df['query'].str.contains(self.patterns['single_quote']).astype(int)
-        df['has_parentheses'] = df['query'].str.contains(self.patterns['parentheses']).astype(int)
-        df['has_semicolon'] = df['query'].str.contains(self.patterns['semicolon']).astype(int)
-        df['has_concat_symbols'] = df['query'].str.contains(self.patterns['concat']).astype(int)
-        df['has_hex'] = df['query'].str.contains(self.patterns['hex']).astype(int)
-        df['has_encoding'] = df['query'].str.contains(self.patterns['encoding']).astype(int)
-        
-        # Contagens
-        df['space_count'] = df['query'].str.count(' ')
-        df['quote_count'] = df['query'].str.count("'")
-        df['special_char_count'] = df['query'].str.count(r"[\"#%&|;=()]")
-        
-        # Features para aprimorar detecção de falsos negativos
-        df['has_union_fragments'] = df['query'].str.contains(self.patterns['union_fragments']).astype(int)
-        df['has_oracle_exploits'] = df['query'].str.contains(self.patterns['oracle_exploits']).astype(int)
-        df['has_char_encoding'] = df['query'].str.contains(self.patterns['char_encoding']).astype(int)
-        df['has_system_tables'] = df['query'].str.contains(self.patterns['system_tables']).astype(int)
-        df['has_time_delay_fn'] = df['query'].str.contains(self.patterns['time_delay']).astype(int)
-        df['has_load_file_fn'] = df['query'].str.contains(self.patterns['load_file']).astype(int)
+            # Pré-processamento básico
+            df['query'] = df['query'].str.lower()
+            df['query_length'] = df['query'].str.len()
 
-        df['has_sleep'] = df['query'].str.contains(self.patterns['sleep']).astype(int)
-        df['has_waitfor'] = df['query'].str.contains(self.patterns['waitfor']).astype(int)
-        df['has_benchmark'] = df['query'].str.contains(self.patterns['benchmark']).astype(int)
-        df['has_information_schema'] = df['query'].str.contains(self.patterns['information_schema']).astype(int)
-        df['has_stacked_queries'] = df['query'].str.contains(self.patterns['stacked_queries']).astype(int)
+            # Função para verificar e converter
+            def safe_contains(column, pattern):
+                result = df['query'].str.contains(pattern, regex=True).fillna(False)
+                result = result.infer_objects(copy=False)
+                return result.astype(int)
 
-        df['has_delete'] = df['query'].str.contains(self.patterns['delete']).astype(int)
-        df['has_truncate'] = df['query'].str.contains(self.patterns['truncate']).astype(int)
-        df['has_alter'] = df['query'].str.contains(self.patterns['alter']).astype(int)
-        df['has_update'] = df['query'].str.contains(self.patterns['update']).astype(int)
-        df['has_insert'] = df['query'].str.contains(self.patterns['insert']).astype(int)
+            # Features básicas
+            df['has_or'] = safe_contains(df['query'], r'\bor\b')
+            df['has_and'] = safe_contains(df['query'], r'\band\b')
+            df['has_not'] = safe_contains(df['query'], r'\bnot\b')
+            df['has_union'] = safe_contains(df['query'], self.patterns['union'])
+            df['has_select_all'] = safe_contains(df['query'], self.patterns['select_all'])
+            df['has_comment'] = safe_contains(df['query'], r'--|#|\/\*')
+            df['has_equals'] = safe_contains(df['query'], '=')
 
-        
+            # Comandos perigosos
+            df['has_drop'] = safe_contains(df['query'], self.patterns['drop'])
+            df['has_exec'] = safe_contains(df['query'], self.patterns['exec'])
+            df['has_function_exploit'] = safe_contains(df['query'], self.patterns['function_exploit'])
+
+            # Padrões estruturais
+            df['has_single_quote'] = safe_contains(df['query'], self.patterns['single_quote'])
+            df['has_parentheses'] = safe_contains(df['query'], self.patterns['parentheses'])
+            df['has_semicolon'] = safe_contains(df['query'], self.patterns['semicolon'])
+            df['has_concat_symbols'] = safe_contains(df['query'], self.patterns['concat'])
+            df['has_hex'] = safe_contains(df['query'], self.patterns['hex'])
+            df['has_encoding'] = safe_contains(df['query'], self.patterns['encoding'])
+
+            # Contagens
+            df['space_count'] = df['query'].str.count(' ')
+            df['quote_count'] = df['query'].str.count("'")
+            df['special_char_count'] = df['query'].str.count(r'["#%&|;=()]')
+
+            df['has_union_fragments'] = safe_contains(df['query'], self.patterns['union_fragments'])
+            df['has_oracle_exploits'] = safe_contains(df['query'], self.patterns['oracle_exploits'])
+            df['has_char_encoding'] = safe_contains(df['query'], self.patterns['char_encoding'])
+            df['has_system_tables'] = safe_contains(df['query'], self.patterns['system_tables'])
+            df['has_time_delay_fn'] = safe_contains(df['query'], self.patterns['time_delay'])
+            df['has_load_file_fn'] = safe_contains(df['query'], self.patterns['load_file'])
+
+            df['has_sleep'] = safe_contains(df['query'], self.patterns['sleep'])
+            df['has_waitfor'] = safe_contains(df['query'], self.patterns['waitfor'])
+            df['has_benchmark'] = safe_contains(df['query'], self.patterns['benchmark'])
+            df['has_information_schema'] = safe_contains(df['query'], self.patterns['information_schema'])
+            df['has_stacked_queries'] = safe_contains(df['query'], self.patterns['stacked_queries'])
+
+            df['has_delete'] = safe_contains(df['query'], self.patterns['delete'])
+            df['has_truncate'] = safe_contains(df['query'], self.patterns['truncate'])
+            df['has_alter'] = safe_contains(df['query'], self.patterns['alter'])
+            df['has_update'] = safe_contains(df['query'], self.patterns['update'])
+            df['has_insert'] = safe_contains(df['query'], self.patterns['insert'])
+
+        else:
+            print("A coluna 'query' não existe no dataframe.")
+
         return df

