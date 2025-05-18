@@ -26,9 +26,11 @@ class SQLIDetector:
             'has_comment', 'has_equals', 'has_drop', 'has_exec', 'has_function_exploit',
             'has_single_quote', 'has_parentheses', 'has_semicolon', 'has_concat_symbols',
             'has_hex', 'has_encoding', 'space_count', 'quote_count', 'special_char_count',
-            'has_union_fragments', 'has_oracle_exploits', 'has_char_encoding',
-            'has_system_tables', 'has_time_delay_fn', 'has_load_file_fn'
+            'has_union_fragments', 'has_oracle_exploits', 'has_char_encoding', 'has_system_tables', 
+            'has_time_delay_fn', 'has_load_file_fn', 'has_delete', 'has_truncate', 'has_alter', 'has_update', 
+            'has_insert' 
         ]
+        
         self.all_feature_names_ordered = []
 
         self.test_indices = None
