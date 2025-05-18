@@ -80,7 +80,8 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db=Depends(get_db)):
             is_malicious_prediction=prediction["is_malicious"],
             prediction_label=prediction["label"],
             probability_benign=float(prediction["probability_benign"]),
-            probability_malicious=float(prediction["probability_malicious"])
+            probability_malicious=float(prediction["probability_malicious"]),
+            active_features=prediction['active_features']
         )
         db.add(new_log_entry)
         db.commit()
