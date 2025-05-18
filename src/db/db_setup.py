@@ -76,6 +76,9 @@ class TrainedModelLog(Base):
     training_duration_seconds = Column(Float, nullable=True)
     notes = Column(Text, nullable=True)
     model_params = Column(Text, nullable=True) 
+    feature_importance_path = Column(String)
+    feature_importance_plot_path = Column(String)
+    feature_importance_data = Column(JSON)
 
     def __repr__(self):
         return (f"<TrainedModelLog(id={self.id}, filename='{self.model_filename}', "

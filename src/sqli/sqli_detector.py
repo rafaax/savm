@@ -4,6 +4,7 @@ import os
 import traceback
 import numpy as np
 import time
+from sklearn.inspection import permutation_importance
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
@@ -16,7 +17,13 @@ from src.sqli.features_extractor import SQLIFeatureExtractor
 class SQLIDetector:
     def __init__(self):
         self.feature_extractor = SQLIFeatureExtractor()
-        self.vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2), lowercase=True)
+        self.vectorizer = TfidfVectorizer(
+            max_features=1000,
+            ngram_range=(1, 3),
+            lowercase=True,
+            stop_words=None,
+            analyzer='char_wb'  # capturar padrões como '--' ou '/*' :///
+        )
         self.scaler = MinMaxScaler()
 
         self.model_params = {
@@ -33,15 +40,30 @@ class SQLIDetector:
         self.tfidf_feature_names = []
 
         self.custom_feature_names = [
-            'query_length', 'has_or', 'has_and', 'has_not', 'has_union', 'has_select_all',
-            'has_comment', 'has_equals', 'has_drop', 'has_exec', 'has_function_exploit',
-            'has_single_quote', 'has_parentheses', 'has_semicolon', 'has_concat_symbols',
-            'has_hex', 'has_encoding', 'space_count', 'quote_count', 'special_char_count',
-            'has_union_fragments', 'has_oracle_exploits', 'has_char_encoding', 'has_system_tables', 
-            'has_time_delay_fn', 'has_load_file_fn', 'has_delete', 'has_truncate', 'has_alter', 'has_update', 
-            'has_insert' 
+            # Features básicas
+            'query_length', 'space_count', 'special_char_count',
+            # Operadores lógicos
+            'has_or', 'has_and', 'has_not',
+            # Comandos DML/DDL
+            'has_drop', 'has_delete', 'has_truncate', 'has_alter',
+            'has_unconditional_delete', 'has_destructive_command',
+            # Técnicas de injeção
+            'has_union', 'has_comment', 'has_semicolon', 
+            'has_always_true', 'has_or_injection',
+            # Time-based attacks
+            'has_time_delay',
+            # System exploration
+            'has_system_tables',
+            # Outras técnicas
+            'has_hex_injection', 'has_second_order',
+            # Contagens
+            'quote_count', 'operator_count',
+            # outras
+            'has_select_all', 'has_exec', 'has_function_exploit',
+            'has_single_quote', 'has_parentheses', 'has_concat_symbols',
+            'has_encoding', 'has_union_fragments', 'has_oracle_exploits',
+            'has_char_encoding', 'has_load_file_fn', 'has_update', 'has_insert'
         ]
-
         self.all_feature_names_ordered = []
 
         self.test_indices = None
@@ -118,6 +140,41 @@ class SQLIDetector:
             print("[INFO] Treinando o modelo SVM...")
             self.model.fit(X_train, y_train)
 
+            print("\n[INFO] Calculando importância das features (SVM)...")
+
+            # Inicializa como None para o caso de falha
+            feature_importance_data = None
+
+            try:
+                # 1. Verifica se o modelo tem coeficientes (SVM linear)
+                if hasattr(self.model, 'coef_'):
+                    # Obtém os coeficientes (usamos valor absoluto)
+                    coef = np.abs(self.model.coef_[0])
+                    
+                    # Cria DataFrame com as features mais importantes
+                    feature_importance = pd.DataFrame({
+                        'feature': self.all_feature_names_ordered,
+                        'importance': coef
+                    }).sort_values('importance', ascending=False)
+                    
+                    print("\nTop 20 features por coeficiente SVM:")
+                    print(feature_importance.head(20))
+                    
+                    # Prepara os dados para retorno
+                    feature_importance_data = {
+                        'top_coef_features': feature_importance.head(20).to_dict('records'),
+                        'stats': {
+                            'mean_importance': coef.mean(),
+                            'max_importance': coef.max()
+                        }
+                    }
+                    
+                else:
+                    print("[AVISO] Este modelo SVM não possui coeficientes (kernel não-linear?)")
+
+            except Exception as e:
+                print(f"[ERRO] Falha ao calcular feature importance: {str(e)}")
+
             print("[INFO] Avaliando modelo...")
             y_pred_test = self.model.predict(X_test)
 
@@ -137,18 +194,6 @@ class SQLIDetector:
             print(f"[INFO] Acurácia: {accuracy:.4f}, Precisão: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
             print(f"[INFO] Matriz de Confusão: {conf_matrix_list}")
 
-            # subset_size = 0.1 
-            # X_subset = X_combined.sample(frac=subset_size, random_state=42)
-            # y_subset = y.loc[X_subset.index]
-
-            # # Importância por permutação no subconjunto
-            # result = permutation_importance(self.model, X_subset, y_subset, n_repeats=10, random_state=42, n_jobs=-1)
-
-            # print("\nImportância das Features por Permutação:")
-            # for i in result.importances_mean.argsort()[::-1]:
-            #     print(f"{self.all_feature_names_ordered[i]}: {result.importances_mean[i]:.3f}")
-
-
             return {
                 "accuracy": accuracy,
                 "precision": precision,
@@ -157,7 +202,8 @@ class SQLIDetector:
                 "classification_report_dict": report_dict,
                 "confusion_matrix_list": conf_matrix_list,
                 "training_duration_seconds": duration,
-                "model_params": self.model_params
+                "model_params": self.model_params,
+                "feature_importance": feature_importance_data
             }
         
         except Exception as e:

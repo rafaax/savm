@@ -30,7 +30,11 @@ class SQLIFeatureExtractor:
             'alter': re.compile(r'\balter\b', re.IGNORECASE), #  Detecta "ALTER", usado para modificar a estrutura de tabelas
             'update': re.compile(r'\bupdate\b', re.IGNORECASE), # Verifica a presença de "UPDATE", empregado para modificar registros existentes
             'insert': re.compile(r'\binsert\b', re.IGNORECASE), #  Procura o comando "INSERT", usado para adicionar registros a uma tabela
-        }
+            'null_byte': re.compile(r'%00|\x00', re.IGNORECASE),
+            'second_order': re.compile(r'\b(?:select|insert)\b.*\b(?:select|insert)\b', re.IGNORECASE),
+            'mysql_commands': re.compile(r'\b(?:load_file|into\s+outfile|into\s+dumpfile)\b', re.IGNORECASE), # Comandos específicos de bancos
+            'mssql_commands': re.compile(r'\b(?:openrowset|opendatasource)\b', re.IGNORECASE) # Comandos específicos de bancos
+        } 
 
     def extract_features(self, df):
 
@@ -88,6 +92,19 @@ class SQLIFeatureExtractor:
             df['has_alter'] = safe_contains(df['query'], self.patterns['alter'])
             df['has_update'] = safe_contains(df['query'], self.patterns['update'])
             df['has_insert'] = safe_contains(df['query'], self.patterns['insert'])
+            df['has_unconditional_delete'] = safe_contains(df['query'], r'\bdelete\s+from\b(?!.*\bwhere\b)')
+            df['has_second_order'] = safe_contains(df['query'], self.patterns['second_order'])
+
+            df['has_always_true'] = safe_contains(df['query'], r'\b(1\s*=\s*1|true|not\s+false)\b')
+            df['has_or_injection'] = safe_contains(df['query'], r'\bor\b\s+\d+\s*=\s*\d+')
+            df['has_time_delay'] = safe_contains(df['query'], r'\b(sleep|waitfor|pg_sleep|benchmark)$$\d+$$')
+            df['has_hex_injection'] = safe_contains(df['query'], r'0x[0-9a-f]{4,}')
+            df['operator_count'] = df['query'].str.count(r'[=<>!]')
+
+            df['has_destructive_command'] = (
+                df['has_drop'] | df['has_truncate'] | 
+                df['has_unconditional_delete']
+            ).astype(int)
 
         else:
             print("A coluna 'query' não existe no dataframe.")

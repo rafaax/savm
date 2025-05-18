@@ -26,8 +26,9 @@ def main():
         print(f"Erro ao carregar dados do dataset: {e}")
         return
     
-    detector = SQLIDetector() # instanciando a classe
-    print("\nIniciando treinamento do modelo")
+    detector = SQLIDetector() # instanciando a classe do sqli detector que faz o treinamento, predição e etc..
+    analyzer = ResultAnalyzer() # intancianciando a classe que faz o analisador de graficcos e etc... 
+    print("\nIniciando treinamento do modelo") 
     
     training_metrics = detector.train(df)
     
@@ -41,6 +42,33 @@ def main():
     current_f1_score = training_metrics.get('f1_score')
     training_duration = training_metrics.get('training_duration_seconds')
     model_params = training_metrics.get('model_params')
+    feature_importance = training_metrics.get('feature_importance')
+
+    feature_plot_path = None
+    perm_importance_csv = None
+    
+    if feature_importance:
+        print("\nProcessando feature importance...")
+        feature_analysis_dir = os.path.join(RESULTS_DIR, "feature_analysis")
+        os.makedirs(feature_analysis_dir, exist_ok=True)
+        
+        # Converte para DataFrame
+        perm_importance_df = pd.DataFrame(feature_importance.get('top_perm_features', {}))
+        
+        # Salva CSV
+        perm_importance_csv = os.path.join(feature_analysis_dir, f"feature_importance_{timestamp_str}.csv")
+        perm_importance_df.to_csv(perm_importance_csv, index=False)
+        
+        # Gera e salva o gráfico usando o método do analyzer
+        feature_plot_path = os.path.join(feature_analysis_dir, f"feature_importance_{timestamp_str}.png")
+        analyzer.save_feature_importance_plot(
+            importance_df=perm_importance_df,
+            filename=feature_plot_path,
+            top_n=15  # Mostra as 15 features mais importantes
+        )
+        
+        print(f"  - Feature importance salva em: {perm_importance_csv}")
+        print(f"  - Gráfico de features salvo em: {feature_plot_path}")
 
     print("\nMétricas de Treinamento:")
     print(f"  Acurácia: {current_accuracy:.4f}" if current_accuracy is not None else "  Acurácia: N/A")
@@ -70,11 +98,6 @@ def main():
 
     if evaluation_data:
         df_original_for_analysis, y_test_cached, y_pred_cached, test_indices_cached = evaluation_data
-
-        
-        
-
-        analyzer = ResultAnalyzer()
 
         fn_df, analysis_details = analyzer.analyze_false_negatives(
             df_original_for_analysis, 
@@ -117,9 +140,13 @@ def main():
             training_duration_seconds=training_duration,
             false_negatives_count=fn_count,
             false_negatives_report_path=str(Path(fn_report_file_path).resolve()) if fn_report_file_path else None,
+            feature_importance_path=str(Path(perm_importance_csv).resolve()) if feature_importance else None,
+            feature_importance_plot_path=str(Path(feature_plot_path).resolve()) if feature_importance else None,
             notes=f"Modelo treinado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}.",
-            model_params=json.dumps(model_params)
+            model_params=json.dumps(model_params),
+            feature_importance_data=json.dumps(feature_importance) if feature_importance else None
         )
+
         db_session.add(new_model_log)
         db_session.commit()
         db_session.refresh(new_model_log)

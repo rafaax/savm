@@ -7,6 +7,54 @@ from sklearn.metrics import recall_score
 
 class ResultAnalyzer:
     @staticmethod
+    def save_feature_importance_plot(importance_df, filename, top_n=20):
+        """
+        Salva um gráfico de barras horizontais com as features mais importantes.
+        
+        """
+        try:
+            plt.figure(figsize=(12, 8))
+            
+            # Seleciona e ordena as top_n features
+            top_features = importance_df.sort_values('importance_mean', ascending=True).tail(top_n)
+            
+            # Cria o gráfico de barras horizontais
+            bars = plt.barh(
+                top_features['feature'], 
+                top_features['importance_mean'],
+                xerr=top_features['importance_std'],
+                color='skyblue',
+                edgecolor='black'
+            )
+            
+            # Adiciona rótulos e título
+            plt.title(f'Top {top_n} Features by Importance', pad=20)
+            plt.xlabel('Importance Score')
+            plt.ylabel('Features')
+            
+            # Adiciona os valores nas barras
+            for bar in bars:
+                width = bar.get_width()
+                plt.text(width, bar.get_y() + bar.get_height()/2, 
+                         f'{width:.3f}', 
+                         va='center', ha='left', fontsize=9)
+            
+            plt.grid(axis='x', alpha=0.3)
+            plt.tight_layout()
+            
+            # Cria o diretório se não existir
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            plt.savefig(filename, dpi=300, bbox_inches='tight')
+            plt.close()
+            
+            print(f"Feature importance plot saved to: {filename}")
+            return True
+        
+        except Exception as e:
+            print(f"Error saving feature importance plot: {e}")
+            return False
+        
+    @staticmethod
     def analyze_false_negatives(df, y_test, y_pred, test_indices, results_dir: str, timestamp: str):
         """
         Analisa instâncias classificadas como falsos negativos para identificar padrões e características.
