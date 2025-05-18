@@ -93,6 +93,8 @@ class SQLIDetector:
             df_features_extracted.loc[:, 'has_tautology'] *= 15
             df_features_extracted.loc[:, 'has_destructive_command'] *= 15
             df_features_extracted.loc[:, 'has_hex_injection'] *= 15
+            df_features_extracted.loc[:, 'has_truncate'] *= 15
+            df_features_extracted.loc[:, 'has_delete'] *= 15
                         
 
             print("[INFO] Gerando matriz TF-IDF...")
@@ -280,7 +282,7 @@ class SQLIDetector:
 
         return {
             "query": query_string,
-            "is_malicious": bool(prediction[0] == '1'),
+            "is_malicious": bool(prediction[0]),
             "probability_benign": probability[0][0],
             "probability_malicious": probability[0][1],
             "label": int(prediction[0]),
