@@ -44,17 +44,6 @@ async def submit_form_endpoint(request_data: Request, db=Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao processar o formulário: {str(e)}")
 
-@router.get("/search", tags=["Formulário"])
-async def search_endpoint(name: str = Query(""), db=Depends(get_db)):
-    query_sql = text("SELECT * FROM form WHERE nome LIKE :name_pattern")
-    try:
-        result = db.execute(query_sql, {"name_pattern": f"%{name}%"})
-        return [dict(row._mapping) for row in result]
-    
-    except Exception as e:
-        print(f"API ERRO ao buscar: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Erro ao realizar a busca: {str(e)}")
-
 @router.post("/detect-sqli", response_model=DetectionResponseDTO, tags=["Detecção SQLi"])
 async def detect_sqli_endpoint(payload: QueryInputDTO, db=Depends(get_db)):
     global sqli_detector_instance
