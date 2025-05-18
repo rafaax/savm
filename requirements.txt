@@ -11,3 +11,4 @@ matplotlib
 setuptools
 pyyaml
 python-dotenv
+shap

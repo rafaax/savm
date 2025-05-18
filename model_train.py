@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timezone
 from database import SessionLocal, TrainedModelLog
 from pathlib import Path 
+import json
 
 MODELS_DIR = 'models'
 DATASET_PATH = 'mocks/dataset-concatenada_v2.csv'
@@ -39,6 +40,7 @@ def main():
     current_recall = training_metrics.get('recall')
     current_f1_score = training_metrics.get('f1_score')
     training_duration = training_metrics.get('training_duration_seconds')
+    model_params = training_metrics.get('model_params')
 
     print("\nMétricas de Treinamento:")
     print(f"  Acurácia: {current_accuracy:.4f}" if current_accuracy is not None else "  Acurácia: N/A")
@@ -109,7 +111,8 @@ def main():
             training_duration_seconds=training_duration,
             false_negatives_count=fn_count,
             false_negatives_report_path=str(Path(fn_report_file_path).resolve()) if fn_report_file_path else None,
-            notes=f"Modelo treinado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}."
+            notes=f"Modelo treinado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}.",
+            model_params=json.dumps(model_params)
         )
         db_session.add(new_model_log)
         db_session.commit()

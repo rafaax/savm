@@ -74,6 +74,7 @@ class TrainedModelLog(Base):
     false_negatives_report_path = Column(String, nullable=True)
     training_duration_seconds = Column(Float, nullable=True)
     notes = Column(Text, nullable=True)
+    model_params = Column(Text, nullable=True) 
 
     def __repr__(self):
         return (f"<TrainedModelLog(id={self.id}, filename='{self.model_filename}', "

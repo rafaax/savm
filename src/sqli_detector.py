@@ -8,6 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+import shap
+from sklearn.inspection import permutation_importance
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from src.features_extractor import SQLIFeatureExtractor
 
@@ -17,7 +19,16 @@ class SQLIDetector:
         self.feature_extractor = SQLIFeatureExtractor()
         self.vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2), lowercase=True)
         self.scaler = MinMaxScaler()
-        self.model = SVC(kernel='rbf', C=1.5, gamma='scale', class_weight='balanced', probability=True)
+
+        self.model_params = {
+            'kernel': 'rbf',
+            'C': 1.5,
+            'gamma': 'scale',
+            'class_weight': 'balanced',
+            'probability': True
+        }
+
+        self.model = SVC(**self.model_params)
 
         self._is_trained = False
         self.tfidf_feature_names = []
@@ -92,9 +103,7 @@ class SQLIDetector:
             print(f"[INFO] Distribuição das classes:\n{y.value_counts().to_dict()}")
 
             print("[INFO] Dividindo dados em treino e teste...")
-            X_train, X_test, y_train, y_test = train_test_split(
-                X_combined, y, test_size=0.3, random_state=42, stratify=y
-            )
+            X_train, X_test, y_train, y_test = train_test_split(X_combined, y, test_size=0.3, random_state=42, stratify=y)
             print(f"[INFO] Tamanho do treino: {len(X_train)}, teste: {len(X_test)}")
 
             self.test_indices = X_test.index.tolist()
@@ -115,11 +124,22 @@ class SQLIDetector:
             f1 = f1_score(y_test, y_pred_test, zero_division=0)
             report_dict = classification_report(y_test, y_pred_test, output_dict=True, zero_division=0)
             conf_matrix_list = confusion_matrix(y_test, y_pred_test).tolist()
-
             duration = time.time() - start_time
+
             print(f"[INFO] Treinamento finalizado em {duration:.2f} segundos.")
             print(f"[INFO] Acurácia: {accuracy:.4f}, Precisão: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
             print(f"[INFO] Matriz de Confusão: {conf_matrix_list}")
+
+            # result = permutation_importance(self.model, X_combined, y, n_repeats=30, random_state=42)
+
+            # print("\nImportância das Features por Permutação:")
+            # for i in result.importances_mean.argsort()[::-1]:
+            #     print(f"{self.all_feature_names_ordered[i]}: {result.importances_mean[i]:.3f}")
+
+            # explainer = shap.KernelExplainer(self.model.predict, X_combined)
+            # shap_values = explainer.shap_values(X_combined)
+            # shap.summary_plot(shap_values, X_combined, feature_names=self.all_feature_names_ordered)
+
 
             return {
                 "accuracy": accuracy,
@@ -128,7 +148,8 @@ class SQLIDetector:
                 "f1_score": f1,
                 "classification_report_dict": report_dict,
                 "confusion_matrix_list": conf_matrix_list,
-                "training_duration_seconds": duration
+                "training_duration_seconds": duration,
+                "model_params": self.model_params
             }
         
         except Exception as e:
@@ -139,7 +160,7 @@ class SQLIDetector:
             return {
                 "accuracy": None, "precision": None, "recall": None, "f1_score": None,
                 "classification_report_dict": None, "confusion_matrix_list": None, "error": str(e),
-                "training_duration_seconds": None
+                "training_duration_seconds": None, "model_params": self.model_params
             }
 
 
