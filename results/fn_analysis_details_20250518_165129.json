@@ -1,0 +1,69 @@
+{
+    "false_negatives_count": 210,
+    "length_statistics": {
+        "count": 210.0,
+        "mean": 419.4809523809524,
+        "std": 323.20014999381794,
+        "min": 1.0,
+        "25%": 51.25,
+        "50%": 422.5,
+        "75%": 718.25,
+        "max": 990.0
+    },
+    "common_patterns_prefix": [
+        {
+            "pattern": "s",
+            "count": 5
+        },
+        {
+            "pattern": "replace",
+            "count": 3
+        },
+        {
+            "pattern": "to_timestamp_tz",
+            "count": 3
+        },
+        {
+            "pattern": "c",
+            "count": 3
+        },
+        {
+            "pattern": "procedure",
+            "count": 2
+        },
+        {
+            "pattern": "000000000000000000000000000000",
+            "count": 2
+        },
+        {
+            "pattern": "111111111111111111111111111111",
+            "count": 2
+        },
+        {
+            "pattern": "limit",
+            "count": 2
+        },
+        {
+            "pattern": "DELETE FROM logs WHERE 1=1;",
+            "count": 2
+        },
+        {
+            "pattern": "031003000270000",
+            "count": 2
+        }
+    ],
+    "keyword_patterns": {
+        "AND": 129,
+        "FROM": 64,
+        "WHERE": 62,
+        "OR": 50,
+        "SELECT": 42,
+        "SLEEP": 12,
+        "UNION": 6,
+        "DELETE": 3,
+        "INSERT": 2,
+        "UPDATE": 1
+    },
+    "feature_differences": {},
+    "overall_recall_on_test": 0.9900934050382112
+}
