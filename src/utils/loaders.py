@@ -1,5 +1,5 @@
 import os
-from src.sqli_detector import SQLIDetector
+from sqli.sqli_detector import SQLIDetector
 
 
 def loadModelSqli(caminho_modelo_para_carregar: str | None) -> 'SQLIDetector | None':

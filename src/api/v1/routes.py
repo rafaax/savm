@@ -4,16 +4,19 @@ from fastapi.responses import FileResponse
 from datetime import datetime
 import os
 import traceback
-from database import get_db
+from db.db_setup import get_db
 from dto.QueryInput import QueryInputDTO
 from dto.DetectionResponse import DetectionResponseDTO
-from database import SQLiDetectionLog
-from src.utils.loaders import loadLastModel, loadModelSqli
+from db.db_setup import SQLiDetectionLog
+from utils.loaders import loadLastModel, loadModelSqli
 
 MODELS_DIR = 'models'
 LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
 MODEL_FILEPATH_TO_LOAD = None
 sqli_detector_instance = None 
+
+print(f"LATEST_MODEL_INFO_FILE: {LATEST_MODEL_INFO_FILE}")
+print(f"MODELS_DIR: {MODELS_DIR}")
 
 
 # busca o ultimo modelo treinado e pega o caminho dele e o nome dele

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
-from src.dto.CommonPatern import CommonPatternDTO
+from dto.CommonPatern import CommonPatternDTO
 
 
 class FalseNegativeAnalysisDetailsDTO(BaseModel):

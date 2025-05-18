@@ -1,9 +1,9 @@
 import pandas as pd
-from src.sqli_detector import SQLIDetector
-from src.analyzer import ResultAnalyzer
+from sqli.sqli_detector import SQLIDetector
+from sqli.analyzer import ResultAnalyzer
 import os
 from datetime import datetime, timezone
-from database import SessionLocal, TrainedModelLog
+from db.db_setup import SessionLocal, TrainedModelLog
 from pathlib import Path 
 import json
 
