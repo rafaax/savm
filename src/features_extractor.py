@@ -19,7 +19,17 @@ class SQLIFeatureExtractor:
             'oracle_exploits': re.compile(r'\|\|utl_http\.request|dbms_\w+|utl_inaddr', re.IGNORECASE),
             'char_encoding': re.compile(r'char\s*$$\s*[\d\s,]+\s*$$', re.IGNORECASE),
             'time_delay': re.compile(r'\b(?:sleep|waitfor|pg_sleep)\s*$$\s*\d+\s*$$', re.IGNORECASE),
-            'load_file': re.compile(r'\bload_file\s*$$|into\s+(?:out|dump)file', re.IGNORECASE)
+            'load_file': re.compile(r'\bload_file\s*$$|into\s+(?:out|dump)file', re.IGNORECASE),
+            'sleep': re.compile(r'\bsleep\(\d+\)', re.IGNORECASE),
+            'waitfor': re.compile(r'\bwaitfor delay\b', re.IGNORECASE),
+            'benchmark': re.compile(r'benchmark\(\d+,', re.IGNORECASE),
+            'information_schema': re.compile(r'information_schema', re.IGNORECASE),
+            'stacked_queries': re.compile(r';\s*select\b', re.IGNORECASE),
+            'delete': re.compile(r'\bdelete\b', re.IGNORECASE),
+            'truncate': re.compile(r'\btruncate\b', re.IGNORECASE),
+            'alter': re.compile(r'\balter\b', re.IGNORECASE),
+            'update': re.compile(r'\bupdate\b', re.IGNORECASE),
+            'insert': re.compile(r'\binsert\b', re.IGNORECASE),
         }
 
     def extract_features(self, df):
@@ -61,5 +71,18 @@ class SQLIFeatureExtractor:
         df['has_system_tables'] = df['query'].str.contains(self.patterns['system_tables']).astype(int)
         df['has_time_delay_fn'] = df['query'].str.contains(self.patterns['time_delay']).astype(int)
         df['has_load_file_fn'] = df['query'].str.contains(self.patterns['load_file']).astype(int)
+
+        df['has_sleep'] = df['query'].str.contains(self.patterns['sleep']).astype(int)
+        df['has_waitfor'] = df['query'].str.contains(self.patterns['waitfor']).astype(int)
+        df['has_benchmark'] = df['query'].str.contains(self.patterns['benchmark']).astype(int)
+        df['has_information_schema'] = df['query'].str.contains(self.patterns['information_schema']).astype(int)
+        df['has_stacked_queries'] = df['query'].str.contains(self.patterns['stacked_queries']).astype(int)
+
+        df['has_delete'] = df['query'].str.contains(self.patterns['delete']).astype(int)
+        df['has_truncate'] = df['query'].str.contains(self.patterns['truncate']).astype(int)
+        df['has_alter'] = df['query'].str.contains(self.patterns['alter']).astype(int)
+        df['has_update'] = df['query'].str.contains(self.patterns['update']).astype(int)
+        df['has_insert'] = df['query'].str.contains(self.patterns['insert']).astype(int)
+
         
         return df
