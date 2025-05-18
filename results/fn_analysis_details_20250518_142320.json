@@ -1,0 +1,66 @@
+{
+    "false_negatives_count": 22,
+    "length_statistics": {
+        "count": 22.0,
+        "mean": 22.227272727272727,
+        "std": 33.55866479292617,
+        "min": 1.0,
+        "25%": 4.5,
+        "50%": 6.5,
+        "75%": 14.25,
+        "max": 121.0
+    },
+    "common_patterns_prefix": [
+        {
+            "pattern": "#NAME?",
+            "count": 2
+        },
+        {
+            "pattern": "create user name identified by",
+            "count": 2
+        },
+        {
+            "pattern": "c",
+            "count": 1
+        },
+        {
+            "pattern": " union select * from users whe",
+            "count": 1
+        },
+        {
+            "pattern": "asc",
+            "count": 1
+        },
+        {
+            "pattern": "update",
+            "count": 1
+        },
+        {
+            "pattern": "desc",
+            "count": 1
+        },
+        {
+            "pattern": "os",
+            "count": 1
+        },
+        {
+            "pattern": "; begin declare @var varchar  ",
+            "count": 1
+        },
+        {
+            "pattern": "v",
+            "count": 1
+        }
+    ],
+    "keyword_patterns": {
+        "SELECT": 2,
+        "INSERT": 2,
+        "FROM": 1,
+        "WHERE": 1,
+        "UNION": 1,
+        "UPDATE": 1,
+        "DELETE": 1
+    },
+    "feature_differences": {},
+    "overall_recall_on_test": 0.9935559461042766
+}

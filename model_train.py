@@ -8,7 +8,7 @@ from pathlib import Path
 import json
 
 MODELS_DIR = 'models'
-DATASET_PATH = 'mocks/dataset-curta+sqliv3.csv'
+DATASET_PATH = 'mocks/dataset-curta+sqliv3_v2.csv'
 RESULTS_DIR = 'results'
 
 
@@ -56,7 +56,7 @@ def main():
         os.makedirs(feature_analysis_dir, exist_ok=True)
         
         # Converte para DataFrame
-        perm_importance_df = pd.DataFrame(feature_importance.get('top_perm_features', {}))
+        perm_importance_df = pd.DataFrame(feature_importance.get('top_coef_features', []))
         
         # Salva CSV
         perm_importance_csv = os.path.join(feature_analysis_dir, f"feature_importance_{timestamp_str}.csv")
@@ -64,6 +64,9 @@ def main():
         
         # Gera e salva o gráfico usando o método do analyzer
         feature_plot_path = os.path.join(feature_analysis_dir, f"feature_importance_{timestamp_str}.png")
+
+        print(perm_importance_df.head())
+
         analyzer.save_feature_importance_plot(
             importance_df=perm_importance_df,
             filename=feature_plot_path,

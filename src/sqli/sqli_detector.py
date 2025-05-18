@@ -88,6 +88,12 @@ class SQLIDetector:
             missing_custom_features = [f for f in self.custom_feature_names if f not in df_features_extracted.columns]
             if missing_custom_features:
                 raise ValueError(f"SQLIFeatureExtractor não gerou as seguintes features esperadas: {missing_custom_features}. Features geradas: {df_features_extracted.columns.tolist()}")
+            
+            # ajustando o impacto de features mais explicitas
+            df_features_extracted.loc[:, 'has_tautology'] *= 15
+            df_features_extracted.loc[:, 'has_destructive_command'] *= 15
+            df_features_extracted.loc[:, 'has_hex_injection'] *= 15
+                        
 
             print("[INFO] Gerando matriz TF-IDF...")
             queries_for_tfidf = df_features_extracted['query'].astype(str)
@@ -114,6 +120,8 @@ class SQLIDetector:
 
             y = df_features_extracted['label']
             print(f"[INFO] Distribuição das classes:\n{y.value_counts().to_dict()}")
+            print(f"[INFO] Distribuição das classes finalizada")
+            
 
             class_counts = y.value_counts()
             classes_to_keep = class_counts[class_counts > 1].index

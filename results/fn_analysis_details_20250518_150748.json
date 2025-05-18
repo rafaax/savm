@@ -1,0 +1,63 @@
+{
+    "false_negatives_count": 18,
+    "length_statistics": {
+        "count": 18.0,
+        "mean": 16.11111111111111,
+        "std": 22.3945604973458,
+        "min": 1.0,
+        "25%": 1.0,
+        "50%": 7.0,
+        "75%": 25.75,
+        "max": 91.0
+    },
+    "common_patterns_prefix": [
+        {
+            "pattern": "s",
+            "count": 4
+        },
+        {
+            "pattern": "update",
+            "count": 2
+        },
+        {
+            "pattern": "3.1E+017",
+            "count": 1
+        },
+        {
+            "pattern": "SELECT *",
+            "count": 1
+        },
+        {
+            "pattern": "SELECT * FROM CustomersLIMIT 3",
+            "count": 1
+        },
+        {
+            "pattern": "SELECT column_name ( s )  FROM",
+            "count": 1
+        },
+        {
+            "pattern": "end and 'icny' like 'icny",
+            "count": 1
+        },
+        {
+            "pattern": "SELECT * FROM Customers GO",
+            "count": 1
+        },
+        {
+            "pattern": "create user name identified by",
+            "count": 1
+        },
+        {
+            "pattern": "a",
+            "count": 1
+        }
+    ],
+    "keyword_patterns": {
+        "SELECT": 6,
+        "FROM": 4,
+        "UPDATE": 2,
+        "AND": 1
+    },
+    "feature_differences": {},
+    "overall_recall_on_test": 0.9952089433058291
+}

