@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from api.v1.routes import router as api_router
+from src.api.v1.routes import router as api_router
 
 app = FastAPI(
     title="API de Detecção de SQL Injection e Formulários",

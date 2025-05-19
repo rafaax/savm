@@ -4,11 +4,11 @@ from fastapi.responses import FileResponse
 from datetime import datetime
 import os
 import traceback
-from db.db_setup import get_db
-from dto.QueryInput import QueryInputDTO
-from dto.DetectionResponse import DetectionResponseDTO
-from db.db_setup import SQLiDetectionLog
-from utils.loaders import loadLastModel, loadModelSqli
+from src.db.db_setup import get_db
+from src.dto.QueryInput import QueryInputDTO
+from src.dto.DetectionResponse import DetectionResponseDTO
+from src.db.db_setup import SQLiDetectionLog
+from src.utils.loaders import loadLastModel, loadModelSqli
 
 MODELS_DIR = 'models'
 LATEST_MODEL_INFO_FILE = os.path.join(MODELS_DIR, 'latest_model_info.txt')
