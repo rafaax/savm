@@ -17,6 +17,21 @@ async function handleSubmit(event) {
         return;
     }
 
+    entries.forEach(([value]) => {
+        CheckSQLI(value).then(response => {
+            if (response.status === 'error') {
+                Swal.fire({
+                    title: 'Successo!',
+                    text: 'Formulário enviado com sucesso.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+        });
+    });
+
+
     const response = await postData('/submit-form', data);
 
     if (response.status === 'error') {
@@ -35,6 +50,21 @@ async function handleSubmit(event) {
         icon: 'success',
         confirmButtonText: 'OK'
     });
+}
+
+
+async function CheckSQLI(field) {
+    const response = await fetch("http://localhost:8000/detect-sqli", {
+        method: 'POST',
+        body: {
+            query: field
+        },
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const responseData = await response.json();
+    return responseData;
 }
 
 async function postData(url, data) {
