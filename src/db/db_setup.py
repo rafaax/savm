@@ -4,7 +4,7 @@ from sqlalchemy import JSON, Column, Integer, String, DateTime, Boolean, Text, F
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -45,7 +45,7 @@ class SQLiDetectionLog(Base):
     __tablename__ = "sqli_detection_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone(timedelta(hours=-3))).astimezone().strftime('%d/%m/%Y %H:%M:%S'), index=True)
     query_text = Column(String) 
     is_malicious_prediction = Column(Boolean)
     prediction_label = Column(Integer)

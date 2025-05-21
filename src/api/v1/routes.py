@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from sqlalchemy import text
 from fastapi.responses import FileResponse
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
 import traceback
 from db.db_setup import get_db
@@ -54,7 +54,7 @@ async def submit_form_endpoint(request_data: Request, db=Depends(get_db)):
             "email": data.get('email'),
             "cpf": data.get('cpf'),
             "address": data.get('address'),
-            "date": datetime.now()
+            "date": datetime.now(timezone(timedelta(hours=-3))).astimezone().strftime('%d/%m/%Y %H:%M:%S')
         })
 
         db.commit()
@@ -117,3 +117,13 @@ async def get_all_queries(db=Depends(get_db)):
     except Exception as e:
         print(f"API ERRO ao buscar as queries: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Erro ao buscar as queries executadas no sistema.")
+    
+@router.get("/all-users-registred", tags=["All Users"])
+async def get_all_users(db=Depends(get_db)):
+    try:
+        result = db.execute(text("SELECT * FROM form"))
+        return [dict(row._mapping) for row in result]
+    
+    except Exception as e:
+        print(f"API ERRO ao buscar os usuarios: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar usuarios no sistema.")

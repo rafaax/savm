@@ -15,70 +15,48 @@
   <aside class="w-64 bg-white p-4 shadow">
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
     <nav class="flex flex-col space-y-2">
-      <button onclick="showSection('tabela1')" class="text-left p-2 hover:bg-gray-200">📋 Usuários</button>
+      <button onclick="showSection('tabela1')" class="text-left p-2 hover:bg-gray-200">📋 requisições</button>
+      <button onclick="showSection('tabela2')" class="text-left p-2 hover:bg-gray-200">📋 Usuarios</button>
     </nav>
   </aside>
 
   <!-- Conteúdo principal -->
-  <main class="flex-1 p-6">
-    <div id="tabela1" class="section">
-      <h2 class="text-xl font-semibold mb-4">Tabela De requisões maliociosas</h2>
-      <table id="usuariosTable" class="display w-full bg-white rounded shadow">
+<main class="flex-1 p-6">
+  <div id="tabela1" class="section w-full">
+    <h2 class="text-xl font-semibold mb-4">Tabela De requisições maliciosas</h2>
+    <div class="overflow-x-auto w-full">
+      <table id="requisicoesTable" class="display w-full bg-white rounded shadow">
         <thead>
           <tr>
             <th>Input</th>
-            <th>é malicioso?</th>
+            <th>É malicioso?</th>
             <th>Momento da requisição</th>
           </tr>
         </thead>
-        <tbody></tbody> <!-- Preenchido via AJAX -->
+        <tbody></tbody> 
       </table>
     </div>
-  </main>
+  </div>
 
-  <script>
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
+  <div id="tabela2" class="section hidden w-full">
+    <h2 class="text-xl font-semibold mb-4">Tabela De usuários</h2>
+    <div class="overflow-x-auto w-full">
+      <table id="usuariosTable" class="display w-full bg-white rounded shadow" style="margin: 0 !important; width: 100% !important;">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>CPF</th>
+            <th>Endereço</th>
+            <th>Data em que foi criado</th>
+          </tr>
+        </thead>
+        <tbody style="margin: 0; width: 100%;"></tbody> 
+      </table>
+    </div>
+  </div>
+</main>
 
-    $(document).ready(function () {
-      let usuariosTable = $('#usuariosTable').DataTable({
-      ajax: {
-        url: 'http://127.0.0.1:8000/all-queries-detected',
-        dataSrc: '' 
-      },
-      columns: [
-        { data: 'query_text' },
-        { data: 'is_malicious_prediction',
-          render: function (data) {
-            return data ? 'Sim' : 'Não';
-          }
-        },
-        {
-          data: 'timestamp',
-          render: function (data) {
-            let date = new Date(data);
-            return date.toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          }
-        }
-      ],
-      order: [[2, 'desc']],
-      language: {
-        search: "Pesquisar:",
-        lengthMenu: "Mostrar _MENU_ registros",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-        paginate: {
-          first: "Primeiro",
-          last: "Último",
-          next: "Próximo",
-          previous: "Anterior"
-        },
-        zeroRecords: "Nenhum registro encontrado"
-      }
-        });
-    });
-  </script>
-
+  <script src="assets/js/admin.js"></script>
 </body>
 </html>
