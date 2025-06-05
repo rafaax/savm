@@ -25,9 +25,15 @@
   <div id="tabela1" class="section w-full">
     <h2 class="text-xl font-semibold mb-4">Tabela De requisições maliciosas</h2>
     <div class="overflow-x-auto w-full">
+      <div class="flex justify-end mb-4">
+        <button onclick="updateRequisicoesTable()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Atualizar
+        </button>
+      </div>
       <table id="requisicoesTable" class="display w-full bg-white rounded shadow">
         <thead>
           <tr>
+            <th>id</th>
             <th>Input</th>
             <th>É malicioso?</th>
             <th>Momento da requisição</th>
@@ -41,9 +47,15 @@
   <div id="tabela2" class="section hidden w-full">
     <h2 class="text-xl font-semibold mb-4">Tabela De usuários</h2>
     <div class="overflow-x-auto w-full">
+      <div class="flex justify-end mb-4">
+        <button onclick="updateUsuariosTable()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Atualizar
+        </button>
+      </div>
       <table id="usuariosTable" class="display w-full bg-white rounded shadow" style="margin: 0 !important; width: 100% !important;">
         <thead>
           <tr>
+            <th>id</th>
             <th>Nome</th>
             <th>Email</th>
             <th>CPF</th>

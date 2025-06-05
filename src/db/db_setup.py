@@ -45,7 +45,7 @@ class SQLiDetectionLog(Base):
     __tablename__ = "sqli_detection_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone(timedelta(hours=-3))).astimezone().strftime('%d/%m/%Y %H:%M:%S'), index=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone(timedelta(hours=-3))), index=True)
     query_text = Column(String) 
     is_malicious_prediction = Column(Boolean)
     prediction_label = Column(Integer)

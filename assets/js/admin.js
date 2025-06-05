@@ -3,6 +3,14 @@
       document.getElementById(id).classList.remove('hidden');
     }
 
+    function updateRequisicoesTable() {
+      $('#requisicoesTable').DataTable().ajax.reload();
+    }
+
+    function updateUsuariosTable() {
+      $('#usuariosTable').DataTable().ajax.reload();
+    }
+
     $(document).ready(function () {
       let requisicoesTable = $('#requisicoesTable').DataTable({
       ajax: {
@@ -10,6 +18,7 @@
         dataSrc: '' 
       },
       columns: [
+        { data: 'id' },
         { data: 'query_text' },
         { data: 'is_malicious_prediction',
           render: function (data) {
@@ -24,7 +33,7 @@
           }
         }
       ],
-      order: [[2, 'desc']],
+      order: [[0, 'desc']],
       language: {
         search: "Pesquisar:",
         lengthMenu: "Mostrar _MENU_ registros",
@@ -45,6 +54,7 @@
         dataSrc: '' 
       },
       columns: [
+        { data: 'id' },
         { data: 'nome' },
         { data: 'email'},
         { data: 'cpf'},
@@ -57,7 +67,7 @@
           }
         }
       ],
-      order: [[4, 'desc']],
+      order: [[0, 'desc']],
       language: {
         search: "Pesquisar:",
         lengthMenu: "Mostrar _MENU_ registros",

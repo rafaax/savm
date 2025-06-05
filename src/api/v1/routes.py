@@ -101,7 +101,7 @@ async def detect_sqli_endpoint(payload: QueryInputDTO, db=Depends(get_db)):
 @router.get("/trained-model-logs", tags=["Trained Model Logs"])
 async def get_trained_model_logs(db=Depends(get_db)):
     try:
-        result = db.execute(text("SELECT * FROM trained_model_logs"))
+        result = db.execute(text("SELECT * FROM trained_model_logs ORDER BY id DESC"))
         return [dict(row._mapping) for row in result]
     
     except Exception as e:
@@ -111,7 +111,7 @@ async def get_trained_model_logs(db=Depends(get_db)):
 @router.get("/all-queries-detected", tags=["All Queries"])
 async def get_all_queries(db=Depends(get_db)):
     try:
-        result = db.execute(text("SELECT * FROM sqli_detection_logs"))
+        result = db.execute(text("SELECT * FROM trained_model_logs ORDER BY id DESC"))
         return [dict(row._mapping) for row in result]
     
     except Exception as e:
